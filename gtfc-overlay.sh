@@ -18,14 +18,18 @@ backup_myconfig(){
         mkdir $GITCLUSTERPATH/$CONFIGPATH
         for i in $CONFIGS; do
             if [ -d $GITCLUSTERPATH/$i ]; then
-                find $GITCLUSTERPATH/$i \
+                find $GITCLUSTERPATH/$i -mindepth 1 \
                 | sed "s;^$GITCLUSTERPATH/$i;;" \
                 | sort \
                 | while read path; do
-                    if [ -d $path ]; then
-                        mkdir -p $GITCLUSTERPATH/${CONFIGPATH}$path
+                    if [ -d $path ] && [ ! -d $GITCLUSTERPATH/${CONFIGPATH}$path ]; then
+                        #echo mkdir -p $GITCLUSTERPATH/${CONFIGPATH}$path
+                             mkdir -p $GITCLUSTERPATH/${CONFIGPATH}$path
                     elif [ -f $path ]; then
-                        install -C $path $GITCLUSTERPATH/${CONFIGPATH}$path
+                        if [ ! -e $GITCLUSTERPATH/${CONFIGPATH}$path ] || ! diff $path $GITCLUSTERPATH/${CONFIGPATH}$path ; then
+                            #echo install -C $path $GITCLUSTERPATH/${CONFIGPATH}$path
+                                 install -C $path $GITCLUSTERPATH/${CONFIGPATH}$path
+                        fi
                     fi
                 done
             fi
@@ -36,14 +40,18 @@ backup_myconfig(){
 apply_myconfig(){
     i=$1
     if [ -d $GITCLUSTERPATH/$i ]; then
-        find $GITCLUSTERPATH/$i \
+        find $GITCLUSTERPATH/$i -mindepth 1 \
         | sort \
         | while read configpath; do
             INSTALLPATH=$( echo $configpath | sed "s;^$GITCLUSTERPATH/$i;;" )
-            if [ -d $configpath ]; then
-                mkdir -p $INSTALLPATH
+            if [ -d $configpath ] && [ ! -d $INSTALLPATH ]; then
+                #echo mkdir -p $INSTALLPATH
+                     mkdir -p $INSTALLPATH
             elif [ -f $configpath ]; then
-                install -C $configpath $INSTALLPATH
+                if [ ! -e $INSTALLPATH ] || ! diff $configpath $INSTALLPATH ; then
+                    #echo install -C $configpath $INSTALLPATH
+                         install -C $configpath $INSTALLPATH
+                fi
             fi
         done
     fi
@@ -62,7 +70,7 @@ done
 
 if [ -e $PERMISSIONSFILE ]; then
     cat $PERMISSIONSFILE \
-    while read path user group octal ; do
+    | while read path user group octal ; do
         case "$path" in "#"*|"") continue; esac
         if [ -e $path ]; then
             chown ${user}:${group} $path
