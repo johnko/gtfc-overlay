@@ -1,0 +1,2 @@
+ntpdate_enable="YES"
+ntpdate_hosts="pool.ntp.org"

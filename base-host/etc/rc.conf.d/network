@@ -1,0 +1,13 @@
+ifconfig_em0="DHCP"
+ifconfig_em1="DHCP"
+ifconfig_re0="DHCP"
+ifconfig_re1="DHCP"
+ifconfig_igb0="DHCP"
+ifconfig_igb1="DHCP"
+ifconfig_bge0="DHCP"
+ifconfig_bge1="DHCP"
+### To enable Link Aggregation: BEGIN
+# cloned_interfaces="lo1 lagg0"
+# ifconfig_lagg0="DHCP laggproto loadbalance  laggport em0 laggport re0"
+# ifconfig_lagg0="inet 192.168.0.2/24 laggproto loadbalance  laggport em0 laggport re0"
+### To enable Link Aggregation: END

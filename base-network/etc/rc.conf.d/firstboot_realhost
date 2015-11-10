@@ -1,0 +1,2 @@
+firstboot_realhost_enable="YES"
+# firstboot_realhost_squid="192.168.0.12:3128"

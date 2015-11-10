@@ -1,0 +1,4 @@
+sshd_enable="YES"
+sshd_rsa1_enable="NO"
+sshd_dsa_enable="NO"
+sshd_ecdsa_enable="NO"

@@ -1,0 +1,19 @@
+FreeBSD 10.2-RELEASE-p7 (GENERIC) #0: Mon Nov  2 14:19:39 UTC 2015
+
+
+    To update the operating system:
+            env PAGER=cat freebsd-update -F fetch install
+            reboot
+    To update programs:                     pkg update
+                                            pkg upgrade
+    To update my scripts:                   fres
+
+    System information:                     stat-all
+    Hard drive information:                 hddid
+    zpool status + geli translation:        zss
+
+    PF firewall, regenerate new pf.conf:    gdf
+                block ssh spammers:         pf-sshinvaliduserip
+                blacklist sshban list:      pf-move-sshban-to-black
+                show tables:                pf-table show
+                show anchor:                pf-anchor show

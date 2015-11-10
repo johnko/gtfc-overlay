@@ -1,0 +1,2 @@
+pflog_enable="YES"
+pflog_logfile="/var/log/pflog"
