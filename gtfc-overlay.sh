@@ -61,7 +61,7 @@ apply_myconfig(){
 backup_myconfig $MYHOST "base-host base-domain base-all"
 
 # backup domain
-backup_myconfig $MYDOMAIN "base-domain base-all"
+backup_myconfig $MYDOMAIN "base-domain"
 
 # apply
 for template in base-all $MYDOMAIN $MYHOST ; do
