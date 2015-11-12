@@ -63,17 +63,17 @@ apply_myconfig(){
 which pf-table >/dev/null 2>&1 && pf-table save all >/dev/null 2>&1
 
 # backup host only if hostfolder don't exist
-backup_myconfig $MYHOST "base-host base-domain base-all"
+backup_myconfig $MYHOST "_base-host _base-domain _base-all"
 
 # backup domain only if domainfolder don't exist
-backup_myconfig $MYDOMAIN "base-domain"
+backup_myconfig $MYDOMAIN "_base-domain"
 
 if [ -d $ROLESDIR ]; then
     MYROLES=$( ls $ROLESDIR )
 fi
 
 # apply
-for template in base-all $MYROLES $MYDOMAIN $MYHOST ; do
+for template in _base-all $MYROLES $MYDOMAIN $MYHOST ; do
     apply_myconfig $template
 done
 
