@@ -59,7 +59,7 @@ apply_myconfig(){
 }
 
 # save pf tables in case needed for backup
-which pf-table && pf-table save all
+which pf-table >/dev/null 2>&1 && pf-table save all >/dev/null 2>&1
 
 # backup host only if hostfolder don't exist
 backup_myconfig $MYHOST "base-host base-domain base-all"
@@ -88,7 +88,7 @@ if [ -e $PERMISSIONSFILE ]; then
 fi
 
 # load crontabbed in case changed
-which crontabbed && crontabbed
+which crontabbed >/dev/null 2>&1 && crontabbed
 
 # load pf tables in case changed
-which pf-table && pf-table load all
+which pf-table >/dev/null 2>&1 && pf-table load all >/dev/null 2>&1
