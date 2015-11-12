@@ -58,10 +58,13 @@ apply_myconfig(){
     fi
 }
 
-# backup host
+# save pf tables in case needed for backup
+which pf-table && pf-table save all
+
+# backup host only if hostfolder don't exist
 backup_myconfig $MYHOST "base-host base-domain base-all"
 
-# backup domain
+# backup domain only if domainfolder don't exist
 backup_myconfig $MYDOMAIN "base-domain"
 
 if [ -d $ROLESDIR ]; then
@@ -83,3 +86,9 @@ if [ -e $PERMISSIONSFILE ]; then
         fi
     done
 fi
+
+# load crontabbed in case changed
+which crontabbed && crontabbed
+
+# load pf tables in case changed
+which pf-table && pf-table load all
