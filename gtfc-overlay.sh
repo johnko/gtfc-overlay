@@ -59,6 +59,9 @@ apply_myconfig(){
     fi
 }
 
+# crontabbed create for user
+id -u urep >/dev/null 2>&1 && su -l urep -c crontabbed
+
 # save pf tables in case needed for backup
 which pf-table >/dev/null 2>&1 && pf-table save all >/dev/null 2>&1
 
@@ -93,3 +96,6 @@ which crontabbed >/dev/null 2>&1 && crontabbed
 
 # load pf tables in case changed
 which pf-table >/dev/null 2>&1 && pf-table load all >/dev/null 2>&1
+
+# crontabbed install for urep
+id -u urep >/dev/null 2>&1 && su -l urep -c crontabbed
