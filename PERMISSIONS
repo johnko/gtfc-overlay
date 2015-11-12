@@ -47,3 +47,9 @@
 /usr/home/urep/.ssh                   urep   urep   700
 /usr/home/urep/.ssh/authorized_keys   urep   urep   600
 /usr/home/urep/.ssh/authorized_keys2  urep   urep   600
+
+/usr/home/urep/bin                          urep   urep   700
+/usr/home/urep/bin/zfs-sync-xz-pull-all     urep   urep   700
+
+/usr/home/urep/crontabbed                                   urep   urep   700
+/usr/home/urep/crontabbed/bidaily-zfs-sync-xz-pull-all      urep   urep   600

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+zfs-sync-xz-pull    tank/urep/dataset    remote_host:22    tank    /scratch/urep
