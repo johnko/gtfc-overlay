@@ -1,1 +1,1 @@
-* 11,23 * * * /usr/home/urep/bin/zfs-sync-xz-pull-all >>/var/log/zfs-sync-xz-pull-all.log 2>&1
+1 11,23 * * * /usr/home/urep/bin/zfs-sync-xz-pull-all >>/var/log/zfs-sync-xz-pull-all.log 2>&1
