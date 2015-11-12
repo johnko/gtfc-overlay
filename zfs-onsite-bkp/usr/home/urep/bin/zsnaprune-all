@@ -1,0 +1,3 @@
+#!/bin/sh
+
+zsnaprune -f short -l 120 -v tank/urep/dataset
