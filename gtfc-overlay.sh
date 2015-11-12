@@ -7,6 +7,7 @@ if [ "x" = "x$GITCLUSTERPATH" ]; then
 fi
 
 PERMISSIONSFILE=$GITCLUSTERPATH/PERMISSIONS
+ROLESDIR=$GITCLUSTERPATH/roles/$MYHOST
 
 MYHOST=$( hostname -s )
 MYDOMAIN=$( hostname -f | sed "s;^$MYHOST\.;;" )
@@ -63,8 +64,12 @@ backup_myconfig $MYHOST "base-host base-domain base-all"
 # backup domain
 backup_myconfig $MYDOMAIN "base-domain"
 
+if [ -d $ROLESDIR ]; then
+    MYROLES=$( ls $ROLESDIR )
+fi
+
 # apply
-for template in base-all $MYDOMAIN $MYHOST ; do
+for template in base-all $MYROLES $MYDOMAIN $MYHOST ; do
     apply_myconfig $template
 done
 
