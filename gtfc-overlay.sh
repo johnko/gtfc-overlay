@@ -7,10 +7,11 @@ if [ "x" = "x$GITCLUSTERPATH" ]; then
 fi
 
 PERMISSIONSFILE=$GITCLUSTERPATH/PERMISSIONS
-ROLESDIR=$GITCLUSTERPATH/_roles/$MYHOST
 
 MYHOST=$( hostname -s )
 MYDOMAIN=$( hostname -f | sed "s;^$MYHOST\.;;" )
+
+ROLESDIR=$GITCLUSTERPATH/_roles/$MYHOST
 
 backup_myconfig(){
     CONFIGPATH=$1
