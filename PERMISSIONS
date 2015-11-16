@@ -1,4 +1,5 @@
 #FILE                                 USER   GROUP  PERMISSIONS
+
 /boot                                 root   wheel  755
 /boot/loader.conf                     root   wheel  644
 /boot/loader.conf.local               root   wheel  644
@@ -20,7 +21,9 @@
 /etc/rc.conf.d/auditd                 root   wheel  644
 /etc/rc.conf.d/firstboot_realhost     root   wheel  644
 /etc/rc.conf.d/ftp-proxy              root   wheel  644
+/etc/rc.conf.d/hostname
 /etc/rc.conf.d/mdnsd                  root   wheel  644
+/etc/rc.conf.d/netwait
 /etc/rc.conf.d/network                root   wheel  644
 /etc/rc.conf.d/ntpdate                root   wheel  644
 /etc/rc.conf.d/openntpd               root   wheel  644
@@ -33,8 +36,9 @@
 /etc/rc.conf.d/syslogd                root   wheel  644
 
 /etc/ssh                              root   wheel  755
-/etc/ssh/sshd_config                  root   wheel  644
 /etc/ssh/ssh_config                   root   wheel  644
+/etc/ssh/sshd_config
+/etc/ssh/sshd_config                  root   wheel  644
 
 /root                                 root   wheel  750
 /root/.ssh                            root   wheel  700
@@ -43,6 +47,17 @@
 
 /usr                                  root   wheel  755
 /usr/home                             root   wheel  755
+/usr/home/_sshtunl
+/usr/home/_sshtunl/bin
+/usr/home/_sshtunl/bin/ssh-tunnel-1
+/usr/home/_sshtunl/bin/ssh-tunnel-all
+/usr/home/_sshtunl/bin/ssh-tunnel-include
+
+/usr/home/_sshtunl/crontabbed
+/usr/home/_sshtunl/crontabbed/0_PATH
+/usr/home/_sshtunl/crontabbed/0_SHELL
+/usr/home/_sshtunl/crontabbed/ssh-tunnel-all-everyminute
+
 /usr/home/urep                        urep   urep   700
 /usr/home/urep/.ssh                   urep   urep   700
 /usr/home/urep/.ssh/authorized_keys   urep   urep   600
@@ -53,5 +68,7 @@
 /usr/home/urep/bin/zsnaprune-all            urep   urep   700
 
 /usr/home/urep/crontabbed                                   urep   urep   700
+/usr/home/urep/crontabbed/0_PATH
+/usr/home/urep/crontabbed/0_SHELL
 /usr/home/urep/crontabbed/bidaily-zfs-sync-xz-pull-all      urep   urep   600
 /usr/home/urep/crontabbed/daily-zsnaprune-all               urep   urep   600
