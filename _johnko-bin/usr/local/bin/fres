@@ -300,7 +300,6 @@ fi
 if [ "0" = "${MYUID}" ]; then
     pkg_initial_install
     [ "$UPDATEBOOKTPKG" ] && pkg_initial_install update
-fi
 REPOS="
 apache-config-freebsd
 btfs
@@ -337,9 +336,10 @@ zsnapple
 " # end of REPOS
 # eza
 # ori-tools
-for i in ${REPOS} ; do
-    git_deploy ${i}
-done
+    for i in ${REPOS} ; do
+        git_deploy ${i}
+    done
+fi
 
 
 if [ "0" = "${MYUID}" ]; then
