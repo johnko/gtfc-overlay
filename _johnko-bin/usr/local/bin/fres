@@ -6,6 +6,11 @@ if [ "x" == "x${REPOSRC}" ]; then
     REPOSRC=https://github.com/johnko
 fi
 
+MYPREFIX=$1
+if [ "x" = "x$MYPREFIX" ]; then
+    MYPREFIX=/usr/local
+fi
+
 ######################################################################
 # Functions
 ######################################################################
@@ -61,7 +66,7 @@ install_hosts_append() {
 git_deploy() {
     repo=$1
     [ -z "$repo" ] && exit 1
-    prefix=$2
+    prefix=$MYPREFIX
     [ -z "$prefix" ] && prefix=$HOME
     if [ ! -d ~/git/${repo} ]; then
         git clone --depth 1 ${REPOSRC}/${repo} ~/git/${repo}
@@ -70,10 +75,10 @@ git_deploy() {
         git pull | grep -v 'Already up-to-date.'
         cd -
     fi
-    install -d -m 700 ${prefix}/bin
+    install -d -m 755 ${prefix}/bin
     if [ -d ~/git/${repo}/bin ]; then
         for i in ~/git/${repo}/bin/* ; do
-            install -C -m 700 ${i} ${prefix}/bin/
+            install -C -m 755 ${i} ${prefix}/bin/
         done
     fi
 }

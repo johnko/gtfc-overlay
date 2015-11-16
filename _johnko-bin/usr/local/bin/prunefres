@@ -4,10 +4,10 @@ fres
 
 if which fres >/dev/null 2>&1 ; then
     rm -fr ~/git
-    fres
+    fres  $HOME
 fi
 
 if [ -e ~/git/skel/bin/fres ]; then
     rm -fr ~/bin
-    sh  ~/git/skel/bin/fres
+    sh  ~/git/skel/bin/fres  $HOME
 fi
