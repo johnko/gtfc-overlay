@@ -103,12 +103,21 @@ which pf-table >/dev/null 2>&1 && pf-table load all >/dev/null 2>&1
 # crontabbed install for urep
 id -u urep >/dev/null 2>&1 && su -l urep -c crontabbed
 
-# create log files for crontabbed
+# create logs for crontabbed
 for i in \
         /var/log/zfs-sync-xz-pull-all.log \
         /var/log/zsnaprune-all.log \
         ; do
     touch $i
     chown urep:urep $i
+    chmod 644 $i
+done
+
+# crete logs for root
+for i in \
+        /var/log/mt-daapd.log \
+        ; do
+    touch $i
+    chown root:wheel $i
     chmod 644 $i
 done
