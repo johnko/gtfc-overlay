@@ -1,1 +1,1 @@
-1 1 * * * /usr/home/urep/bin/zsnaprune-all >>/var/log/zsnaprune-all.log 2>&1
+1 1 * * * zsnaprune-all >>/var/log/zsnaprune-all.log 2>&1
