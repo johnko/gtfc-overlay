@@ -59,8 +59,26 @@ apply_myconfig(){
     fi
 }
 
-# crontabbed create for user
-id -u urep >/dev/null 2>&1 && su -l urep -c crontabbed
+users_crontabbed(){
+    if which crontabbed >/dev/null 2>&1 ; then
+        # root crontab
+        crontabbed
+        # urep crontab
+        id -u urep     >/dev/null 2>&1 && su -l urep     -c crontabbed
+        # _sshtunl crontab
+        chsh -s /bin/csh          _sshtunl
+        id -u _sshtunl >/dev/null 2>&1 && su -l _sshtunl -c crontabbed
+        chsh -s /usr/sbin/nologin _sshtunl
+    fi
+}
+
+ch_own_mod(){
+    chown ${2}:${3} $1
+    chmod $4 $1
+}
+
+# crontabbed create folder for users
+users_crontabbed
 
 # save pf tables in case needed for backup
 which pf-table >/dev/null 2>&1 && pf-table save all >/dev/null 2>&1
@@ -88,36 +106,28 @@ if [ -e $PERMISSIONSFILE ]; then
     | while read path user group octal ; do
         case "$path" in "#"*|"") continue; esac
         if [ -e $path ]; then
-            chown ${user}:${group} $path
-            chmod $octal $path
+            ch_own_mod $path $user $group $octal
         fi
     done
 fi
 
-# load crontabbed in case changed
-which crontabbed >/dev/null 2>&1 && crontabbed
-
 # load pf tables in case changed
 which pf-table >/dev/null 2>&1 && pf-table load all >/dev/null 2>&1
 
-# crontabbed install for urep
-id -u urep >/dev/null 2>&1 && su -l urep -c crontabbed
+# crontabbed install for users
+users_crontabbed
 
-# create logs for crontabbed
-for i in \
-        /var/log/zfs-sync-xz-pull-all.log \
-        /var/log/zsnaprune-all.log \
-        ; do
-    touch $i
-    chown urep:urep $i
-    chmod 644 $i
-done
-
-# crete logs for root
-for i in \
-        /var/log/mt-daapd.log \
-        ; do
-    touch $i
-    chown root:wheel $i
-    chmod 644 $i
+# create logs
+TOUCHFILES="
+/var/log/zfs-sync-xz-pull-all.log urep urep  644
+/var/log/zsnaprune-all.log        urep urep  644
+/var/log/mt-daapd.log             root wheel 644
+"
+echo "TOUCHFILES" \
+| while read path user group octal ; do
+    case "$path" in "#"*|"") continue; esac
+    touch $path
+    if [ -e $path ]; then
+        ch_own_mod $path $user $group $octal
+    fi
 done
