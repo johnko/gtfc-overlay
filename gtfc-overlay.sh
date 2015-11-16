@@ -123,7 +123,7 @@ TOUCHFILES="
 /var/log/zsnaprune-all.log        urep urep  644
 /var/log/mt-daapd.log             root wheel 644
 "
-echo "TOUCHFILES" \
+echo "$TOUCHFILES" \
 | while read path user group octal ; do
     case "$path" in "#"*|"") continue; esac
     touch $path
