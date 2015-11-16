@@ -65,8 +65,11 @@ id -u urep >/dev/null 2>&1 && su -l urep -c crontabbed
 # save pf tables in case needed for backup
 which pf-table >/dev/null 2>&1 && pf-table save all >/dev/null 2>&1
 
+# backup all
+backup_myconfig .bkp.$MYHOST "_base-host _base-domain _base-all"
+
 # backup host only if hostfolder don't exist
-backup_myconfig $MYHOST "_base-host _base-domain _base-all"
+backup_myconfig $MYHOST "_base-host"
 
 # backup domain only if domainfolder don't exist
 backup_myconfig $MYDOMAIN "_base-domain"
