@@ -1,0 +1,94 @@
+#!/bin/sh
+
+ZFS_DATASET="scratch/dfs"
+CLUSTER_USER="root"
+USER_ID="0"
+CLUSTER_ID="${1}"
+shift
+if [ "x" != "x${1}" ]; then
+    ZFS_DATASET="${1}"
+    shift
+fi
+USERHOME=/root
+#USERHOME=/usr/home/${CLUSTER_USER}
+
+## install freebsd package dependencies
+pkg install -y \
+python27 libffi indexinfo gettext-runtime py27-setuptools27 \
+py27-pybonjour mDNSResponder  \
+py27-libtorrent-rasterbar libtorrent-rasterbar GeoIP boost-libs icu boost-python-libs \
+fusefs-libs
+
+#py27-pip \
+
+#pip install \
+
+## start bonjour
+service mdnsd onestatus >/dev/null 2>&1 || service mdnsd onestart >/dev/null 2>&1
+
+## load fuse
+if ! kldstat | grep fuse >/dev/null 2>&1 ; then
+    kldload fuse
+    if ! kldstat | grep fuse >/dev/null 2>&1 ; then
+        echo "ERROR: can't load fuse"
+        exit 1
+    fi
+fi
+
+## set freebsd tunables for cache invalidation
+sysctl vfs.usermount=1 >/dev/null 2>&1 # allow users to mount
+sysctl vfs.fuse.mmap_enable=1 >/dev/null 2>&1 # has to be 1 so cp doens't error Bad Address
+sysctl vfs.fuse.data_cache_enable=1 >/dev/null 2>&1 # has to be 1 so cp doens't error Bad Address
+# invalidate fuse data cache to force reads (especially since the torrent file will change without telling FUSE)
+sysctl vfs.fuse.data_cache_invalidate=1 >/dev/null 2>&1
+# invalidate the lookup cache because files can be removed without telling FUSE
+sysctl vfs.fuse.lookup_cache_enable=1 >/dev/null 2>&1
+
+## if zfs, try creating the dataset
+if which zfs >/dev/null 2>&1 && ! zfs list ${ZFS_DATASET} >/dev/null 2>&1 ; then
+    zfs create -p ${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/chunks
+    if ! zfs list ${ZFS_DATASET} >/dev/null 2>&1 ; then
+        echo "ERROR: can't find zfs ${ZFS_DATASET}"
+        exit 1
+    fi
+    install -d -m 700 /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/tmp/
+    umount -f /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/tmp/
+    mount -t tmpfs tmpfs /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/tmp/
+fi
+
+## Setup ssh key, should replace with openssl later
+#if [ ! -e ${USERHOME}/.ssh/id_ed25519 ]; then
+#    su -l ${CLUSTER_USER} -c "ssh-keygen -N '' -t ed25519 -f ~/.ssh/id_ed25519"
+#fi
+## Install files
+#install -m 644 -o ${CLUSTER_USER} ${HOME}/git/delugefs/src/fuse.py        ${USERHOME}/fuse.py
+#install -m 755 -o ${CLUSTER_USER} ${HOME}/git/delugefs/src/delugefs.py    ${USERHOME}/delugefs.py
+#install -m 755 -o ${CLUSTER_USER} ${HOME}/git/delugefs/bin/delugefs-shell ${USERHOME}/delugefs-shell
+#cp -r ${HOME}/git/delugefs/webui ${USERHOME}/
+#find ${USERHOME}/webui -type d -exec chmod 755 {} \;
+#find ${USERHOME}/webui -type f -exec chmod 644 {} \;
+#chown ${CLUSTER_USER} /${ZFS_DATASET}
+
+## check if mounted already in case we are on same host but different disk
+if ! mount | grep "/dfs/${CLUSTER_ID}" >/dev/null 2>&1 ; then
+    MOUNT="--mount /dfs/${CLUSTER_ID}"
+    install -d -m 755 -o ${CLUSTER_USER} /dfs/${CLUSTER_ID}
+    ## if using gtfc
+    if [ ! -e /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/meta/.git ]; then
+        gtfc-bootstrap /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/meta
+        gtfc-watch /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/meta >/dev/null 2>&1
+    fi
+else
+    ## if using gtfc
+    if [ ! -e /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/meta/.git ]; then
+        gtfc-join `net-ip` /${ZFS_DATASET%2}/_delugefs_${CLUSTER_ID}/meta /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/meta
+        gtfc-watch /${ZFS_DATASET}/_delugefs_${CLUSTER_ID}/meta >/dev/null 2>&1
+    fi
+fi
+
+## run the command
+#su -l ${CLUSTER_USER} -c "/usr/local/bin/python2.7 -m dfs \
+/usr/local/bin/python2.7 -m dfs \
+    ${MOUNT} \
+    --cluster ${CLUSTER_ID} \
+    --root /${ZFS_DATASET}/_delugefs_${CLUSTER_ID} $*

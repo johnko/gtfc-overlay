@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# READY
+
+ROOTPASS="password"
+
+pkg install -y x11/xorg x11-wm/xfce4-wm \
+Thunar xfce4-tumbler \
+lumina \
+hal \
+thunderbird \
+firefox \
+gstreamer1-plugins-good \
+gstreamer1-libav \
+net/tightvnc
+
+if [ ! -e /usr/local/bin/vncserver ]; then
+    echo "ERROR: install failed"
+    exit 1
+fi
+
+mkdir ~/.vnc
+
+XINITRC=${HOME}/.vnc/xstartup
+if [ ! -f $XINITRC ]; then
+    cat > $XINITRC <<EOF
+#!/bin/sh
+xrdb \$HOME/.Xresources &
+xfwm4 &
+xfce4-panel &
+xterm -bg black -fg gray &
+EOF
+    chmod +x $XINITRC
+fi
+
+install -m 755 ~/git/deploy/usr/local/etc/rc.d/vnc /usr/local/etc/rc.d/vnc
+
+cd /usr/local/bin
+patch < ~/git/deploy/patch/vncserver.patch
+
+sysrc -f /etc/rc.conf.d/dbus dbus_enable="YES"
+sysrc -f /etc/rc.conf.d/hald hald_enable="YES"
+
+service dbus start
+service hald start
+
+cat >~/.vnc/passwd.b64 <<EOF
+29g8/XJ6FFg=
+EOF
+chmod 400 ~/.vnc/passwd.b64
+cat ~/.vnc/passwd.b64 | openssl enc -d -base64 >~/.vnc/passwd
+chmod 400 ~/.vnc/passwd
+
+echo > ~/local/cshproxy
+
+vncserver -depth 24 -geometry 1280x800 -nolisten tcp :1
+
+echo
+JAILIP=`ifconfig | grep inet | awk '{print $2}'`
+echo "Connect with ssh -L 5901:${JAILIP}:5901 you@your-server-ip"
+echo "Then connect with password to vnc://localhost:5901"

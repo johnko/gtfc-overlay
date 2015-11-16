@@ -1,0 +1,16 @@
+#!/bin/sh
+
+export CALLBACKPORT=22222
+export REMOTEHOST=ip_or_hostname
+export REMOTEPORT=22
+
+# exit if running already
+THISSCRIPT=${0##*/}
+if pgrep -lf ${THISSCRIPT} > /dev/null 2> /dev/null ; then
+    exit 1
+fi
+
+sh ${HOME}/bin/ssh-tunnel-include
+
+# to connect back
+# ssh -luser -p 22222 localhost

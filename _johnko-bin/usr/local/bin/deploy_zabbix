@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# TODO
+
+pkg install -y net-mgmt/zabbix24-frontend net-mgmt/zabbix24-server net-mgmt/zabbix24-agent
+
+echo
+JAILIP=`ifconfig | grep inet | awk '{print $2}'`
+echo "Visit http://${JAILIP}/"

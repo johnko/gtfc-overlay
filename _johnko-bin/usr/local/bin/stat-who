@@ -1,0 +1,8 @@
+#!/bin/sh
+
+who -q | \
+	egrep -v '^\s*#' | \
+  tr ' ' '\n' | \
+  sort -u | \
+  tr '\n' ' ' | \
+  sed 's/^ *//g'

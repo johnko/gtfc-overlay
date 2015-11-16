@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# on server
+
+su -l urep -c "beet convert -y"

@@ -1,0 +1,37 @@
+#!/bin/sh
+
+NEWUID="$1"
+DB="$2"
+DBUSER="$3"
+DBPASS="$4"
+
+if [ "x" = "x${DBPASS}" ]; then
+    echo "ERROR: $0 needs 4 args."
+    exit 1
+fi
+
+pkg install -y postgresql93-server
+
+if [ ! -e /usr/local/bin/createuser ]; then
+    echo "ERROR: postgresql install failed"
+    exit 1
+fi
+
+pw usermod -n pgsql -u ${NEWUID}
+find / -user 70 -exec chown pgsql {} \;
+sysrc postgresql_enable="YES"
+service postgresql initdb
+service postgresql start
+/usr/local/bin/createuser -U pgsql ${DBUSER}
+/usr/local/bin/createdb -E utf8 -U pgsql -O ${DBUSER} ${DB}
+/usr/local/bin/psql -U pgsql -d template1 -c "ALTER ROLE ${DBUSER} WITH password '${DBPASS}';"
+if [ ! -e /usr/local/pgsql/data/pg_hba.conf.dist ]; then
+    cp -a /usr/local/pgsql/data/pg_hba.conf /usr/local/pgsql/data/pg_hba.conf.dist
+fi
+cat >/usr/local/pgsql/data/pg_hba.conf <<EOF
+local   all             all                                     trust
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+hostnossl  ${DB}   ${DBUSER}    samehost                trust
+EOF
+service postgresql restart

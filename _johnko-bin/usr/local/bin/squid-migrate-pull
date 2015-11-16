@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#DRYRUN="-n"
+RSYNC="rsync $DRYRUN -viaLP"
+
+REMOTEFOLDER=$( ssh $1 ioc-pathof squid )
+
+LOCALFOLDER=$( ioc-pathof squid )
+
+$RSYNC  ${1}:${REMOTEFOLDER}/var/squid/cache/               ${LOCALFOLDER}/var/squid/cache/

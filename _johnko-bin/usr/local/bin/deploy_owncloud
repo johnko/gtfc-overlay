@@ -1,0 +1,66 @@
+#!/bin/sh
+
+# READY
+
+DB="owncloud"
+DBUSER="owncloud"
+DBPASS="password"
+
+if [ "x" != "x${OWNCLOUDDBPASS}" ]; then
+    DBPASS=${OWNCLOUDDBPASS}
+fi
+
+if sysctl -a | grep security.jail.sysvipc_allowed >/dev/null ; then
+    if sysctl security.jail.sysvipc_allowed | grep 0 >/dev/null ; then
+        echo "This jail is not configured to allow sysvipc."
+        echo "you need to add jail_example_parameters=\"allow.sysvipc=1\""
+        exit 1
+    fi
+fi
+
+if [ "x" == "x${FQDN}" ]; then
+    echo "Please set or export variable FQDN"
+    exit 1
+fi
+
+deploy_postgresql93 1060 ${DB} ${DBUSER} ${DBPASS}
+deploy_php_apache24
+
+pkg install -y owncloud \
+php56-pdo_pgsql \
+php56-pgsql
+
+
+APPS="
+    documents   https://apps.owncloud.com/CONTENT/content-files/168711-documents.zip
+    bookmakrs   https://apps.owncloud.com/CONTENT/content-files/168710-bookmarks.zip
+    contact     https://github.com/owncloud/contacts/releases/download/v8.0.5/contacts-0.3.0.19.tar.gz
+    calendar    https://github.com/owncloud/calendar/releases/download/v0.6.5/calendar.zip
+    rainloop    http://repository.rainloop.net/v2/other/owncloud/rainloop.zip
+"
+
+if [ "x" = "xgetapps" ]; then
+    echo "${APPS}" \
+    | while read appname appurl ; do
+        if [ "x" != "x${appname}" ] && [ "x" != "x${appurl}" ]; then
+            if [ ! -e /root/local/owncloud/${appurl##*/} ]; then
+                wget -P /root/local/owncloud "${appurl}"
+            fi
+            if [ ! -d /usr/local/www/owncloud/apps/${appname} ] ; then
+                tar x -C /usr/local/www/owncloud/apps -f /root/local/owncloud/${appurl##*/}
+            fi
+        fi
+    done
+fi
+
+cat ~/git/deploy/usr/local/etc/apache24/extra/owncloud.conf \
+| sed "s/localhost.my.domain/${FQDN}/" \
+>/usr/local/etc/apache24/Includes/owncloud.conf
+
+service apache24 restart
+
+echo
+echo "Visit https://${FQDN}/owncloud/"
+echo "- setup Database to PostgreSQL with sql://${DBUSER}:${DBPASS}@localhost/${DB}"
+echo "- install apps: Documents, Calendar, Contacts, Mail, Bookmarks"
+#echo "- see share options on bottom left in Calendar/Contacts for iOS CalDav/CardDav URL"

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# READY
+
+deploy_nginx
+
+pkg install -y lang/php56
+
+sysrc php_fpm_enable="YES"
+
+service php-fpm start

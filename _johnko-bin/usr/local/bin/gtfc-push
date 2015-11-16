@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# should be called from a kqueue watcher or manually
+# $0 /path/to/watch
+
+export LOCALFOLDER=$1
+. ${HOME}/bin/gtfc-parselocalfolder
+
+[ -d ${LOCALFOLDER} ] || exit 1
+
+cd ${LOCALFOLDER}
+
+git add --all .
+git commit -a -m "modified - `whoami`@`hostname`"
+
+. ${HOME}/bin/gtfc-ssh-command
+
+sh ${HOME}/bin/gtfc-nodes \
+| while read userhostport remotefolder ; do
+    export TOSPLIT=$userhostport
+    . ${HOME}/bin/gtfc-parse
+    if [ "x" != "x${HOST}" ]; then
+        install -d -m 700 "/tmp/${USER}"
+        LOCK_FILE="/tmp/${MYUSER}/${HOST}-${SAFELOCALFOLDERNAME}.lock"
+        lockf $LOCK_FILE git push ssh://${MYUSER}@${HOST}:${PORT}/${remotefolder} master:refs/heads/tomerge
+    fi
+done

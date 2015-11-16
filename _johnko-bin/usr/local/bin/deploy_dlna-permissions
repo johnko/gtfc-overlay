@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# READY
+
+zfs list vault/data || zfs create vault/data
+if ! zfs list vault/data > /dev/null ; then
+    echo "ERROR: missing vault/data"
+    exit 1
+fi
+
+install -d -m 755 /vault/data/movies
+install -d -m 755 /vault/data/music
+install -d -m 755 /vault/data/photos
+
+crontabbed
+if sysctl security.jail.jailed | grep 1 >/dev/null 2>&1; then
+    echo > /root/crontabbed/zsnapple_bootpool_hourly
+    echo > /root/crontabbed/zsnapple_pool_hourly
+fi
+echo "10 * * * * dlna-permissions" > /root/crontabbed/dlna_permission_hourly
+crontabbed

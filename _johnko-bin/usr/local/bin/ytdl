@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ "x" = "x$PERSONALMNT" ]; then
+    PERSONALMNT=/vault/data
+fi
+
+install -d -m 755 -o urep ${PERSONALMNT}/ff/_1srcytdl
+
+chown -R urep ${PERSONALMNT}/ff/_1srcytdl
+
+su -l urep -c "youtube-dl \
+--no-playlist --restrict-filenames -w --no-continue \
+--write-description --write-info-json -k \
+--no-cache-dir \
+-o '${PERSONALMNT}/ff/_1srcytdl/%(uploader)s-%(title)s-%(id)s.%(ext)s' \
+'${1}'"

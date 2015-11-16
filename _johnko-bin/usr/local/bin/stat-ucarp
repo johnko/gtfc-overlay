@@ -1,0 +1,14 @@
+#!/bin/sh
+
+case `uname -s` in
+  FreeBSD)
+		if pgrep -lf 'ucarp' >/dev/null 2>/dev/null ; then
+			pgrep -lf '/usr/local/sbin/ucarp' \
+			| grep -v 'sed' \
+			| sed -e 's;-[Bza] ;;g' -e 's;-[ivfudsp] [^ ]*;;g' -e 's;[0-9][0-9]* /usr/local/sbin/ucarp;;g' \
+			| awk '{print $2,$1}' \
+			| sort -u \
+			| column -t
+		fi
+	;;
+esac

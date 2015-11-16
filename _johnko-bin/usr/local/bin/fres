@@ -1,0 +1,361 @@
+#!/bin/sh
+
+MYUID=`id -u`
+
+if [ "x" == "x${REPOSRC}" ]; then
+    REPOSRC=https://github.com/johnko
+fi
+
+######################################################################
+# Functions
+######################################################################
+
+install_ssh_auth_keys() {
+    prefix=$1
+    if [ -z "$prefix" ]; then
+        prefix=$HOME
+    fi
+    install -d -m 700 ${prefix}/.ssh
+    chmod 700 ${prefix}/.ssh
+    cat >${prefix}/.ssh/authorized_keys <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCVFa6ppe1CpTM6KIuSVV32d/fyz1E7XC6w6HkROSp7oLYC5PFeQRHtJQfNLW5JmCsEVogPJmUS/6e801Q8IKMajlTFpUzR9I+qGutmqBZNo6cmTLgTn3SVMueZb20GsYcBOhJRgsbgKbPdwQM/PKfnJYQzhzU6iOcrU+HCBQaTkMGT5HLsPO0FrVo3KnFdv1uGBAwxqyddztnuCrgxm/WbOy8fcHkReTOeLtGJsQu8fqWtBSzaAGlo2Rk/O4jEYX0uMV9Eq+yuZkHQP6tGNHDp4hPGEnnXhubhLYKmCH47Olq7CFqyUEeE74TmqZVNeY1dr7XunhsOO1RMLvYu4NYz chill
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDY+s7s+bs27WQV0gWZzwiRSZxALgnTBxtqb1ed39sZGzxcO0s1v9KoGtRaaisSIkMP+WSgzE1DIYBoW2FUGiD+lQXNlQSiIzw7oQCbR+EMuHO6+LW93hjix3c1rbrnhJfQST7Mwi/GfoFefxyW77/CO2Xkh2OkruNPUoBAXv/CvujF1ZXdL8D0tViXfpp/18tYx5feuLQMtq9Oi6A4N0021ICfAmUtGcpkQ8STldeVFxgBuVI3xtLmPqc8v45kB5EcNh9hvtaPznpKQCwQ6NTAv4NXRSVhApCKU1uY+TCNiHmnNwSnZ/PgKFmYlsh9vJr0CZbX6wbB++9Uwh3j51Xd dip
+EOF
+    chmod 600 ${prefix}/.ssh/authorized_keys
+}
+
+install_resolv_overwrite() {
+    resolvfile=/etc/resolv.conf
+    if sysctl security.jail.jailed | grep 0 >/dev/null 2>&1; then
+        if [ -e /boot/../mfsroot ]; then
+            resolvfile=/boot/resolv.conf.overwrite
+        fi
+    fi
+    if [ ! -e ${resolvfile} ]; then
+        cat >${resolvfile} <<EOF
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+EOF
+    fi
+}
+
+install_hosts_overwrite() {
+    if sysctl security.jail.jailed | grep 0 >/dev/null 2>&1; then
+        if [ ! -e /boot/hosts.overwrite ] && [ -e /boot/../mfsroot ]; then
+            cat >/boot/hosts.overwrite <<EOF
+::1 localhost localhost.my.domain
+127.0.0.1 localhost localhost.my.domain
+EOF
+        fi
+    fi
+}
+
+install_hosts_append() {
+    if sysctl security.jail.jailed | grep 0 >/dev/null 2>&1; then
+        if [ ! -e /boot/hosts.append ] && [ -e /boot/../mfsroot ]; then
+            echo >/boot/hosts.append
+        fi
+    fi
+}
+
+git_deploy() {
+    repo=$1
+    [ -z "$repo" ] && exit 1
+    prefix=$2
+    [ -z "$prefix" ] && prefix=$HOME
+    if [ ! -d ~/git/${repo} ]; then
+        git clone --depth 1 ${REPOSRC}/${repo} ~/git/${repo}
+    else
+        cd ~/git/${repo}
+        git pull | grep -v 'Already up-to-date.'
+        cd -
+    fi
+    install -d -m 700 ${prefix}/bin
+    if [ -d ~/git/${repo}/bin ]; then
+        for i in ~/git/${repo}/bin/* ; do
+            install -C -m 700 ${i} ${prefix}/bin/
+        done
+    fi
+}
+
+pkg_bootstrap() {
+    if [ ! -f /sbin/pkg-static ]; then
+        if [ -e /usr/local/sbin/pkg-static ]; then
+            env ASSUME_ALWAYS_YES=YES pkg bootstrap
+        fi
+        # test again after bootstrap
+        if [ -e /usr/local/sbin/pkg-static ]; then
+            install -C -m 755 -o root -g wheel \
+                /usr/local/sbin/pkg-static /sbin/pkg-static
+        fi
+    else
+        if [ -e /usr/local/sbin/pkg-static ] && \
+            ! diff /usr/local/sbin/pkg-static /sbin/pkg-static ; then
+                install -C -m 755 -o root -g wheel \
+                    /usr/local/sbin/pkg-static /sbin/pkg-static
+        fi
+    fi
+}
+
+pkg_initial_install() {
+    if [ -e $HOME/local/pkglist ]; then
+        PKGLIST="`cat $HOME/local/pkglist | grep -v '^#' | tr ' ' '\n' | sort -u | grep -v '^\$'`"
+    elif [ -e $HOME/perm/pkglist ]; then
+        PKGLIST="`cat $HOME/perm/pkglist | grep -v '^#' | tr ' ' '\n' | sort -u | grep -v '^\$'`"
+    fi
+    if [ -e ${FFMPEGPKG} ] || [ -e /boot/packages/ffmpeg-custom.txz ]; then
+        tmppkglist="${PKGLIST}"
+        PKGLIST="`echo ${tmppkglist} | sed 's;ffmpeg;;'`"
+    fi
+    if [ ! -e /boot/kernel/kernel ] || sysctl security.jail.jailed | grep 1 >/dev/null 2>&1; then
+        ## we are going to omit beadm and iocage from installing in jails
+        tmppkglist="${PKGLIST}"
+        PKGLIST="`echo ${tmppkglist} | sed 's;beadm;;' | sed 's;ezjail;;' | sed 's;iocage;;' | sed 's;openntpd;;' | sed 's;ucarp;;'`"
+    fi
+    if [ "update" = "$1" ] && [ -e /boot/../mfsroot ]; then
+        if sysctl security.jail.jailed | grep 0 >/dev/null 2>&1; then
+            if [ -d /boot/packages ]; then
+                if [ -d /boot/packages_old ]; then
+                    rm -r /boot/packages_old
+                fi
+                mv /boot/packages /boot/packages_old
+            fi
+            install -d -m 755 /boot/packages
+            if [ -f /usr/local/etc/pkg.conf ]; then
+                cat /usr/local/etc/pkg.conf >/usr/local/etc/pkg.conf.bkp
+            fi
+            install -d -m 755 /usr/local/etc
+            cat /usr/local/etc/pkg.conf.bkp | grep -v "PKG_CACHEDIR" >/usr/local/etc/pkg.conf
+            echo "PKG_CACHEDIR = \"${mnt}/boot/packages\";" >>/usr/local/etc/pkg.conf
+            if [ "x" != "x$PKGLIST" ]; then
+                pkg-static fetch -y $PKGLIST
+            fi
+            if [ -f /usr/local/etc/pkg.conf.bkp ]; then
+                cat /usr/local/etc/pkg.conf.bkp >/usr/local/etc/pkg.conf
+                rm /usr/local/etc/pkg.conf.bkp
+            else
+                rm /usr/local/etc/pkg.conf
+            fi
+            if [ -e ${LAMEPKG} ]; then
+                cp ${LAMEPKG} /boot/packages/
+            fi
+            if [ -e ${LIBAACPLUSPKG} ]; then
+                cp ${LIBAACPLUSPKG} /boot/packages/
+            fi
+            if [ -e ${FFMPEGPKG} ]; then
+                rm /boot/packages/ffmpeg*
+                cp ${FFMPEGPKG} /boot/packages/
+                cp ${FFMPEGPKG} /boot/packages/ffmpeg-custom.txz
+            fi
+        fi
+    else
+        if [ "x" != "x$PKGLIST" ]; then
+            pkg-static install -y $PKGLIST
+        fi
+        if hostname | grep squid >/dev/null ;then
+            pkg-static remove -y openssl
+        else
+            if [ -e /boot/../mfsroot ]; then
+                forcepkg="-f"
+            else
+                unset forcepkg
+            fi
+            for i in ${LAMEPKG} ${LIBAACPLUSPKG} ${FFMPEGPKG} ; do
+                if [ -e ${i} ]; then
+                    pkg-static add ${forcepkg} ${i}
+                fi
+            done
+        fi
+    fi
+}
+
+add_users() {
+    # dont do it in jail
+    if [ -e /boot/kernel/kernel ] && sysctl security.jail.jailed | grep 0 >/dev/null 2>&1; then
+        if [ ! -d /usr/home/urep ]; then
+            if cat /etc/passwd | grep urep >/dev/null 2>&1 ; then
+                rmuser -yv urep
+            fi
+            ### Add urep user
+            echo "urep:1001::::::/usr/home/urep:/bin/csh:" | adduser -w no -f -
+            ### Add btfs user
+            #echo "btfs:1002::::::/usr/home/btfs:/bin/csh:" | adduser -w no -f -
+            #pw groupmod operator -m btfs
+            ### Add _sshtunl user
+            echo "_sshtunl:1022::::::/usr/home/_sshtunl:/usr/sbin/nologin:" | adduser -w no -f -
+        fi
+    fi
+}
+
+pkg_quart() {
+    if grep "latest" /etc/pkg/FreeBSD.conf >/dev/null 2>&1 ; then
+        cp /etc/pkg/FreeBSD.conf /tmp/FreeBSD.conf
+        cat /tmp/FreeBSD.conf \
+            | sed 's;latest;quarterly;' \
+            > /etc/pkg/FreeBSD.conf
+    fi
+}
+
+pkg_latest() {
+    if grep "quarterly" /etc/pkg/FreeBSD.conf >/dev/null 2>&1 ; then
+        cp /etc/pkg/FreeBSD.conf /tmp/FreeBSD.conf
+        cat /tmp/FreeBSD.conf \
+            | sed 's;quarterly;latest;' \
+            > /etc/pkg/FreeBSD.conf
+    fi
+}
+
+######################################################################
+# Main
+######################################################################
+
+while getopts z:bh o; do
+    case "$o" in
+        b) UPDATEBOOKTPKG=1 ;;
+    esac
+done
+
+
+install_ssh_auth_keys
+
+
+if [ ! -d ~/perm ]; then
+    # are you root?
+    if [ "0" = "${MYUID}" ]; then
+        NEWDATASET=`zfs list | grep -o '^[[:alnum:]]*/root/bin' | sed 's/bin/perm/'`
+        if [ "x" != "x${NEWDATASET}" ]; then
+            zfs create -o exec=off -o setuid=off ${NEWDATASET}
+        fi
+    fi
+    if [ ! -d ~/perm ]; then
+        install -d -m 700 ~/perm
+    fi
+fi
+if [ ! -d ~/local ]; then
+    # are you root?
+    if [ "0" = "${MYUID}" ]; then
+        NEWDATASET=`zfs list | grep -o '^[[:alnum:]]*/root/bin' | sed 's/bin/local/'`
+        if [ "x" != "x${NEWDATASET}" ]; then
+            zfs create -o exec=off -o setuid=off ${NEWDATASET}
+        fi
+    fi
+    if [ ! -d ~/local ]; then
+        install -d -m 700 ~/local
+    fi
+fi
+
+
+if [ "0" = "${MYUID}" ]; then
+    install_resolv_overwrite
+    install_hosts_overwrite
+    install_hosts_append
+    add_users
+    test -e /etc/mail/aliases.db || newaliases
+    pkg_latest
+    pkg_bootstrap
+    if ! which git > /dev/null ; then
+        pkg_quart
+        pkg-static install -y git
+    fi
+fi
+
+if ! which git > /dev/null ; then
+    # Try unsetting PROXY and pkg update -f then reset proxy
+    noproxy
+    pkg-static update -f
+    pkg-static install -y git
+    if ! which git > /dev/null ; then
+        # Just quit
+        echo "ERROR: git not found"
+        exit 1
+    fi
+fi
+
+if [ ! -d ~/git ]; then
+    # are you root?
+    if [ "0" = "${MYUID}" ]; then
+        NEWDATASET=`zfs list | grep -o '^[[:alnum:]]*/root/bin' | sed 's/bin/git/'`
+        if [ "x" != "x${NEWDATASET}" ]; then
+            zfs create -o setuid=off ${NEWDATASET}
+        fi
+    fi
+    if [ ! -d ~/git ]; then
+        install -d -m 700 ~/git
+    fi
+fi
+git_deploy skel
+if [ ! -e ~/local/tmux.conf.status ]; then
+    install -C -m 600 ~/git/skel/local/tmux.conf.status ~/local/tmux.conf.status
+fi
+if ls -A1 ~/git/skel/ | egrep -v '^\.git$' | grep '^\.' >/dev/null 2>&1 ; then
+    for i in $(ls -A1 ~/git/skel/ | egrep -v '^\.git$' | grep '^\.') ; do
+        install -C -m 644 ~/git/skel/${i} ${HOME}/
+    done
+    tar -c -f - -C ~/git/skel perm | tar -C ~/ -x -f -
+    chmod 600 ~/perm/*
+fi
+if [ "0" = "${MYUID}" ]; then
+    pkg_initial_install
+    [ "$UPDATEBOOKTPKG" ] && pkg_initial_install update
+fi
+REPOS="
+apache-config-freebsd
+btfs
+ccasfs
+crontabbed
+delugefs
+deploy
+ffmpeg-tools
+freebsd-install-script
+freebsd-pf-script
+freebsd-sortconf
+freebsd-system-info
+github-backup
+gtfc
+hddid
+iocage-tools
+md2html
+md5sha256
+mount_iso
+netconn
+newsyslog.conf.d
+nginx-config-sites-enabled
+psnap
+pwgen
+rad
+randomword
+rsync-tools
+setproxy
+ssh-multi
+ssh-tools
+vmrc
+zfs-tools
+zsnapple
+" # end of REPOS
+# eza
+# ori-tools
+for i in ${REPOS} ; do
+    git_deploy ${i}
+done
+
+
+if [ "0" = "${MYUID}" ]; then
+    if [ -d /boot/packages_cache ] && [ -d /var/cache/pkg ]; then
+        rm -r /var/cache/pkg
+    fi
+    # run always
+    which newsyslog-conf-setup >/dev/null 2>&1 && newsyslog-conf-setup
+    which periodic-config >/dev/null 2>&1 && periodic-config
+    which syslog-config >/dev/null 2>&1 && syslog-config
+
+    # test if not an iocage jail chroot
+    if [ -e /boot/kernel/kernel ] && sysctl security.jail.jailed | grep 0 >/dev/null 2>&1; then
+        which pf-table >/dev/null 2>&1 && pf-table save all >/dev/null 2>&1
+        which pf-sshinvaliduserip
+        # run last because may disconnect
+        which gdf >/dev/null 2>&1 && gdf
+    else
+        # we are in a jail
+        which nginx-config-sites-enabled >/dev/null 2>&1 && nginx-config-sites-enabled
+    fi
+fi

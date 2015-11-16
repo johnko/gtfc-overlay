@@ -1,0 +1,117 @@
+#!/bin/sh
+
+SNAPLISTTMP=/tmp/`whoami`/zsnaprune
+
+exiterror() {
+    exitcode=$1
+    shift
+    if [ "0" != "${exitcode}" ] && [ "x" == "x${SILENT}" ]; then
+        echo "ERROR: ${@}" >&2
+    fi
+    exit ${exitcode}
+}
+
+snapformat() {
+    FORMAT="$1"
+    case "${FORMAT}" in
+        # short format 2 digit for everything in UTC
+        short) date -u +%y%m%d-%H%M%S ;;
+        # https://www.samba.org/samba/docs/man/manpages/vfs_shadow_copy2.8.html
+        *) TZ=GMT date +GMT-%Y.%m.%d-%H.%M.%S ;;
+    esac
+}
+
+snappattern() {
+    FORMAT="$1"
+    case "${FORMAT}" in
+        short) echo "${VOLUME}@${PREFIX}[0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9]" ;;
+        *) echo "${VOLUME}@${PREFIX}GMT-[0-9][0-9][0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]-[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]" ;;
+    esac
+}
+
+generatesnapshots() {
+    install -d -m 700 ${SNAPLISTTMP}
+
+    zfs list -H -t snapshot -o name -r ${VOLUME} \
+        | sort \
+        | grep "${SNAPPATTERN}" \
+        >${SNAPLISTTMP}/${SAFEVOLUME}.${PREFIX}.${LIMIT}.${SAFEFORMAT}.${RECURSIVE}.txt
+}
+
+listsnapshots() {
+	cat ${SNAPLISTTMP}/${SAFEVOLUME}.${PREFIX}.${LIMIT}.${SAFEFORMAT}.${RECURSIVE}.txt
+}
+
+onlydatepart() {
+    FORMAT="$1"
+    case "${FORMAT}" in
+        short) echo "${VOLUME}@${PREFIX}[0-9][0-9][0-9][0-9][0-9][0-9]" ;;
+        *) echo "${VOLUME}@${PREFIX}GMT-[0-9][0-9][0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]" ;;
+    esac
+}
+
+cleanupsnaps() {
+	# if limit is not blank, then maybe need to delete snaps
+    if [ "x" != "x${LIMIT}" ]; then
+        SNAPPATTERN=`snappattern ${FORMAT}`
+        generatesnapshots
+            COUNT=`listsnapshots | grep -o $(onlydatepart ${FORMAT}) | sort -u | wc -l`
+        TODESTROY=`listsnapshots | head -1`
+        while [ ${COUNT} -gt ${LIMIT} ]; do
+
+            if [ "x" == "x${SILENT}" ]; then
+                echo "zfs destroy ${RECURSIVE} ${TODESTROY}"
+                      zfs destroy ${RECURSIVE} ${TODESTROY}
+            else
+                      zfs destroy ${RECURSIVE} ${TODESTROY} >/dev/null 2>&1
+            fi
+
+            generatesnapshots
+                COUNT=`listsnapshots | grep -o $(onlydatepart ${FORMAT}) | sort -u | wc -l`
+            TODESTROY=`listsnapshots | head -1`
+        done
+    fi
+}
+
+usage() {
+    cat <<EOF
+usage: ${0##*/}
+    -f short|shadowcopy         date format
+    -h                          help
+    -l 7|31|365                 limit of snapshots matching prefix and date format
+    -p prefix                   prefix of snapshot
+    -q                          quiet / silent
+    -r                          recursive snapshots
+    -v volume                   zfs dataset or volume to operate on
+EOF
+}
+
+while getopts f:l:p:v:hqr o; do
+	case "$o" in
+		f) FORMAT="$OPTARG" ;;
+		l) LIMIT="$OPTARG" ;;
+		p) PREFIX="$OPTARG" ;;
+		v) VOLUME="$OPTARG" ;;
+		h) usage; exit 1 ;;
+		q) SILENT=1 ;;
+		r) RECURSIVE="-r" ;;
+		[?]) usage; exit 1 ;;
+	esac
+done
+
+LIMIT=`echo ${LIMIT} | tr -cd '0-9'`
+PREFIX=`echo ${PREFIX} | tr -cd '[:alnum:]._-'`
+SNAPNAME=`snapformat ${FORMAT}`
+SAFEVOLUME=`echo ${VOLUME} | tr -cd '[:alnum:]._-'`
+SAFEFORMAT=`echo ${FORMAT} | tr -cd '[:alnum:]._-'`
+
+if [ "x" == "x${VOLUME}" ]; then
+	exiterror 1 "missing -v VOLUME"
+fi
+
+if ! zfs list ${VOLUME} >/dev/null 2>/dev/null ; then
+    #exiterror 1 "$VOLUME doesn't exist"
+    exit 1
+fi
+
+cleanupsnaps

@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# TODO
+
+DB="piwik"
+DBUSER="piwik"
+DBPASS="password"
+
+if [ "x" != "x${PIWIKDBPASS}" ]; then
+    DBPASS=${PIWIKDBPASS}
+fi
+
+if [ "x" == "x${FQDN}" ]; then
+    echo "Please set or export variable FQDN"
+    exit 1
+fi
+
+deploy_php_apache24
+
+deploy_mysql_percona55 ${DB} ${DBUSER} ${DBPASS}
+
+pkg install -y www/piwik \
+php56-mbstring \
+php56-simplexml \
+php56-openssl
+
+if [ ! -e /usr/local/www/piwik ]; then
+    echo "ERROR: install failed"
+    exit 1
+fi
+
+cat ~/git/deploy/usr/local/etc/apache24/extra/piwik.conf \
+| sed "s/localhost.my.domain/${FQDN}/" \
+>/usr/local/etc/apache24/Includes/piwik.conf
+
+# To pass the piwik system check
+cat /usr/local/etc/php.ini-production | sed 's/;always_populate_raw_post_data = -1/always_populate_raw_post_data = -1/' >/usr/local/etc/php.ini
+if [ ! -e /usr/local/www/piwik/misc/log-analytics/import_logs.py.orig ]; then
+    cp -a /usr/local/www/piwik/misc/log-analytics/import_logs.py /usr/local/www/piwik/misc/log-analytics/import_logs.py.orig
+fi
+cat /usr/local/www/piwik/misc/log-analytics/import_logs.py.orig | sed 's;/usr/local/bin/python;/usr/bin/python;' >/usr/local/www/piwik/misc/log-analytics/import_logs.py
+if [ ! -e /usr/bin/python ]; then
+    ln -s /usr/local/bin/python /usr/bin/python
+fi
+
+service apache24 restart
+
+echo
+JAILIP=`ifconfig | grep inet | awk '{print $2}'`
+echo "Visit http://${JAILIP}/piwik/"
+echo "- setup Database to MySQL with sql://${DBUSER}:${DBPASS}@localhost/${DB}"

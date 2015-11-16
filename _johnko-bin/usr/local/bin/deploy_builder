@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# READY
+
+deploy_buildersquid
+deploy_builderffmpeg

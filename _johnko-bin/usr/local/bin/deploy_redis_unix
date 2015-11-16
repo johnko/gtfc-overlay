@@ -1,0 +1,21 @@
+#!/bin/sh
+
+pkg install -y redis
+
+if [ ! -e /usr/local/etc/redis.conf ]; then
+    echo "ERROR: redis install failed."
+    exit 1
+fi
+
+
+if [ ! -e /usr/local/etc/redis.conf.orig ]; then
+    cp /usr/local/etc/redis.conf /usr/local/etc/redis.conf.orig
+fi
+sed 's/^port .*/port 0/' /usr/local/etc/redis.conf.orig >/usr/local/etc/redis.conf
+echo 'unixsocket /var/run/redis/redis.sock' >>/usr/local/etc/redis.conf
+echo 'unixsocketperm 770' >>/usr/local/etc/redis.conf
+mkdir -p /var/run/redis
+chown redis:redis /var/run/redis
+chmod 755 /var/run/redis
+sysrc redis_enable="YES"
+service redis start

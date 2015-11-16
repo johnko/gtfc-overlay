@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# READY
+
+for i in $( service -l | grep '^ucarp' ) ; do
+    ## start ucarp* but only if enabled
+    ## because it could have been disabled on purpose
+    service ${i} start
+done

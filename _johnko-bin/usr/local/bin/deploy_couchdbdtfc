@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# READY
+
+if [ "x" == "x${REPOSRC}" ]; then
+    REPOSRC=https://github.com/johnko
+fi
+
+if [ "x" == "x${FQDN}" ]; then
+    echo "Please set or export variable FQDN" 2>&1
+    exit 1
+fi
+
+env FQDN=${FQDN} deploy_couchdb
+env REPOSRC=${REPOSRC} FQDN=${FQDN} deploy_dtfc

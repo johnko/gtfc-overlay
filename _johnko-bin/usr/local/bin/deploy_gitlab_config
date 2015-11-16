@@ -1,0 +1,170 @@
+#!/bin/sh
+
+# NOT READY, Installs but doesn't start
+
+DB="gitlabhq_production"
+DBUSER="git"
+DBPASS="password"
+ROOTPASS="password"
+
+if [ "x" != "x${GITLABROOTPASS}" ]; then
+    ROOTPASS=${GITLABROOTPASS}
+fi
+if [ "x" != "x${GITLABDBPASS}" ]; then
+    DBPASS=${GITLABDBPASS}
+fi
+
+if [ "x" == "x${HTTP_PROXY}" ]; then
+    echo "ERROR: expecting HTTP_PROXY"
+    exit 1
+fi
+if [ "x" == "x${GITLABPKG}" ]; then
+    echo "ERROR: GITLABPKG not defined."
+    exit 1
+fi
+
+# Based on https://github.com/t-zuehlsdorff/gitlabhq/blob/master/doc/install/installation-freebsd.md
+
+# 0 jail needs export jail_**MY_JAIL_NAME**_parameters="allow.sysvipc=1"
+if sysctl -a | grep security.jail.sysvipc_allowed >/dev/null ; then
+    if sysctl security.jail.sysvipc_allowed | grep 0 >/dev/null ; then
+        echo "This jail is not configured to allow sysvipc."
+        echo "you need to add jail_example_parameters=\"allow.sysvipc=1\""
+        exit 1
+    fi
+fi
+
+if [ "x" == "x${FQDN}" ]; then
+    echo "Please set or export variable FQDN"
+    exit 1
+fi
+
+
+echo 1.a Dependencies
+
+deploy_gitlab_runtimedeps
+
+# for this script
+pkg install -y sudo
+
+
+echo 1.b Package
+
+if [ -e ${GITLABPKG} ]; then
+    if ! pkg add ${GITLABPKG} ; then
+        echo "ERROR: gitlab install failed"
+        exit 1
+    fi
+fi
+
+
+echo 2 postgresql
+deploy_postgresql93 1100 ${DB} ${DBUSER} ${DBPASS}
+
+
+echo 3 redis
+
+deploy_redis_unix
+# Add git user to redis group
+pw groupmod redis -m git
+
+
+echo 4 gitlab
+# Become git user
+#su git
+# Go to GitLab installation folder
+#cd /usr/local/www/gitlab
+# Update GitLab config file, follow the directions at top of file
+#The option host: should be set to your domain, e.g. "gitlab.mysite.com".
+if sysctl security.jail.jailed | grep 1 >/dev/null ; then
+    cat /usr/local/www/gitlab/config/gitlab.yml.sample \
+    | sed 's/# ssh_port: 22/ssh_port: 23/' \
+    | sed "s/host: localhost/host: ${FQDN}/" \
+    | sed 's/port: 80/port: 443/' \
+    | sed 's/https: false/https: true/' \
+    >/usr/local/www/gitlab/config/gitlab.yml
+#    | sed 's/# email_enabled: true/email_enabled: false/' \
+else
+    cat /usr/home/git/gitlab/config/gitlab.yml.sample \
+    | sed "s/host: localhost/host: ${FQDN}/" \
+    | sed 's/port: 80/port: 443/' \
+    | sed 's/https: false/https: true/' \
+    >/usr/local/www/gitlab/config/gitlab.yml
+#    | sed 's/# email_enabled: true/email_enabled: false/' \
+fi
+# Find number of cores
+#sysctl hw.ncpu
+# Enable cluster mode if you expect to have a high load instance
+# Ex. change amount of workers to 3 for 2GB RAM server
+# Set the number of workers to at least the number of cores
+cat /usr/local/www/gitlab/config/unicorn.rb.sample \
+| sed 's/worker_processes 3/worker_processes 1/' \
+>/usr/local/www/gitlab/config/unicorn.rb
+# Configure Git global settings for git user, used when editing via web editor
+sudo -u git -H git config --global core.autocrlf "input"
+# Change the Redis socket path if you are not using the default Debian / Ubuntu configuration
+# Configure Redis to use the modified socket path
+# Change 'production' line to 'unix:/usr/local/var/run/redis/redis.sock'
+cat /usr/local/www/gitlab/config/resque.yml.sample \
+>/usr/local/www/gitlab/config/resque.yml
+# Change 'secure password' with the value you have given to $password
+# You can keep the double quotes around the password
+cat /usr/local/www/gitlab/config/database.yml.postgresql \
+>/usr/local/www/gitlab/config/database.yml
+# Install gitlab-shell
+sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:shell:install[v2.6.3] REDIS_URL=unix:/var/run/redis/redis.sock RAILS_ENV=production
+
+
+echo 8 Initialise Database
+
+yes yes | sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:setup RAILS_ENV=production GITLAB_ROOT_PASSWORD=${ROOTPASS}
+# Check Application Status
+sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:env:info RAILS_ENV=production
+# Compile Assets
+sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake assets:precompile RAILS_ENV=production
+# Enable services
+sysrc gitlab_enable="YES"
+# Start Your GitLab Instance
+service gitlab start
+
+
+if sysctl security.jail.jailed | grep 0 >/dev/null ; then
+    echo Other services: openntpd
+    sysrc openntpd_enable="YES"
+    service openntpd start
+
+    echo Other services: nginx
+    deploy_nginx
+fi
+
+
+echo Other services: SSH
+
+if sysctl security.jail.jailed | grep 1 >/dev/null ; then
+    cat /etc/ssh/sshd_config \
+    | sed 's/#Port 22/Port 23/' \
+    >/etc/ssh/sshd_config.tmp
+    cat /etc/ssh/sshd_config.tmp >/etc/ssh/sshd_config
+    rm /etc/ssh/sshd_config.tmp
+fi
+sshd-config
+service sshd start
+
+
+if sysctl security.jail.jailed | grep 1 >/dev/null ; then
+    echo Other services: MAIL
+    deploy_postfix
+fi
+
+
+echo
+JAILIP=`ifconfig | grep inet | awk '{print $2}'`
+cat <<EOF
+Visit http://${JAILIP}/
+Login as root:${ROOTPASS}
+Repos to clone:
+    https://github.com/johnko/*
+    https://github.com/johnko/dtfc.git
+    https://github.com/qq99/echoplexus.git
+    https://gitlab.com/gitlab-org/gitlab-ce.git
+EOF

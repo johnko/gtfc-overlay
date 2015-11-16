@@ -1,0 +1,11 @@
+#!/bin/sh
+
+PUBKEY=id_ed25519.pub
+
+if [ -n "$*" ]; then
+	cat $HOME/.ssh/${PUBKEY} | ssh $* "umask 077; test -d ~/.ssh || install -d -m 700 ~/.ssh ; cat >>~/.ssh/authorized_keys2"
+else
+	echo "Appends $HOME/.ssh/${PUBKEY} to remotehost's ~/.ssh/authorized_keys2"
+	echo "Usage:  $0 -p 22 user@remotehost"
+	exit 1
+fi

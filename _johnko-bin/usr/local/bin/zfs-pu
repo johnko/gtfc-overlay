@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export RECURSIVE="R"
+
+zfs-pu-non-recursive $*

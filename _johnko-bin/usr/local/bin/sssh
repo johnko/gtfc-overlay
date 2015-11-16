@@ -1,0 +1,8 @@
+#!/bin/sh
+
+while [ 1 ]; do
+	ssh $*
+	RESULT="$?"
+	[ "$RESULT" = "0" ] && break || echo -n "ssh error: $RESULT... "
+	/bin/sleep 5
+done

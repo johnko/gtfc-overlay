@@ -1,0 +1,19 @@
+#!/bin/sh
+
+case `uname -s` in
+	FreeBSD)
+		if swapinfo | grep -v 'Device.*Used.*Avail' | grep '[0-9]' \
+				>/dev/null 2>&1 ; then
+			LINE=$( swapinfo -h | tail -1 )
+			USEDZERO=$( echo $LINE | awk '{print $3}' )
+			if [ "$USEDZERO" = "0B" ]; then
+				TOTAL=$( echo $LINE | awk '{print $4}' )
+			else
+				TOTAL=$( top -b | grep 'Swap:' | egrep -o '[0-9]+[BKMG] Total' | \
+					awk '{print $1}' )
+			fi
+			USEDAVAIL=$( echo $LINE | awk '{print $3,$4}' )
+			echo "${TOTAL} ${USEDAVAIL}"
+		fi
+	;;
+esac

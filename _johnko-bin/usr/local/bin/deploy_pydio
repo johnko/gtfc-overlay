@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# TODO: update to version 6
+
+pkg install -y www/pydio
+
+echo
+JAILIP=`ifconfig | grep inet | awk '{print $2}'`
+echo "Visit http://${JAILIP}/"

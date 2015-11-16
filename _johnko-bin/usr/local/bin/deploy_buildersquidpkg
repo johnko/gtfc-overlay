@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# READY
+
+# unattended build
+export BATCH=yes
+
+
+if [ "x" == "x${SQUIDPKG}" ]; then
+    echo "ERROR: SQUIDPKG not defined."
+    exit 1
+fi
+if [ -e ${SQUIDPKG} ]; then
+    rm ${SQUIDPKG}
+fi
+
+
+build_it_now() {
+    ## don't run portsnap
+    # psnap
+    mkdir -p /var/ports/packages/All
+    echo "building ${1}"
+    safename=$( echo "${1}" | tr / _ )
+    if [ -e /var/db/ports/${safename}/options ]; then
+        rm /var/db/ports/${safename}/options
+    fi
+    cd /usr/ports/${1}
+    make && make install && make package \
+    && cp /var/ports/usr/ports/${1}/work/pkg/*.txz /var/ports/packages/All/ \
+    && make clean
+    ## see /var/ports/packages/All/
+}
+
+
+PORTNAME="www/squid"
+## install squid and dependencies
+pkg install -y ${PORTNAME} lang/perl5.20
+## remove squid because we want custom options
+## openssl from ports conflicts https://lists.freebsd.org/pipermail/freebsd-questions/2015-June/266245.html
+pkg remove -y ${PORTNAME} openssl
+## we want LAX_HTTP=on
+if [ ! -e /usr/ports/${PORTNAME}/Makefile.orig ]; then
+    cp /usr/ports/${PORTNAME}/Makefile /usr/ports/${PORTNAME}/Makefile.orig
+fi
+cat /usr/ports/${PORTNAME}/Makefile.orig | sed 's;OPTIONS_DEFAULT=;OPTIONS_DEFAULT=LAX_HTTP SSL SSL_CRTD TP_PF LARGEFILE ;' >/usr/ports/${PORTNAME}/Makefile
+build_it_now ${PORTNAME}
+
+
+if ! which squid ; then
+    echo "Failed to build."
+    exit 1
+fi

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+ls -1 "${1}" \
+| while read line ; do
+    if [ "x" != "x${line}" ]; then
+        echo "---------- ${line} ----------"
+        su -l urep -c sh <<EOF
+      /usr/local/bin/ffmpeg -hide_banner -i "${line}" -f ffmetadata -vn -an -loglevel quiet -
+EOF
+    fi
+done

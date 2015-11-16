@@ -1,0 +1,56 @@
+#!/bin/sh
+
+OUTDIR=~/crontabbed
+
+OUTFILE=.crontab.`date -u +%y%m%d-%H%M%S`
+
+CURRENTCRON=.tmp
+
+MYUID=`id -u`
+
+if [ "x" != "x${OUTDIR}" ] && [ ! -d ${OUTDIR} ]; then
+    # are you root?
+    if [ "0" == "${MYUID}" ]; then
+        NEWDATASET=`zfs list | grep -o '^[[:alnum:]]*/root/bin' | sed 's/bin/crontabbed/'`
+        if [ "x" != "x${NEWDATASET}" ]; then
+            zfs create ${NEWDATASET}
+        fi
+    fi
+    # may need to create outdir as normal user
+    if [ ! -d ${OUTDIR} ]; then
+        install -d -m 700 ${OUTDIR}
+    fi
+    # are you root?
+    if [ "0" == "${MYUID}" ]; then
+        if            [ -d ~/git/crontabbed/root.crontabbed ]; then
+            install -C -m 600 ~/git/crontabbed/root.crontabbed/* ${OUTDIR}/
+        fi
+    fi
+    if  [ "1001" == "${MYUID}" ] && \
+        [ "1001" == "`id -u urep`" ]; then
+        if            [ -d ~/git/crontabbed/urep.crontabbed ]; then
+            install -C -m 600 ~/git/crontabbed/urep.crontabbed/* ${OUTDIR}/
+        fi
+    fi
+    if  [ "1022" == "${MYUID}" ] && \
+        [ "1022" == "`id -u _sshtunl`" ]; then
+        if            [ -d ~/git/crontabbed/_sshtunl.crontabbed ]; then
+            install -C -m 600 ~/git/crontabbed/_sshtunl.crontabbed/* ${OUTDIR}/
+        fi
+    fi
+fi
+
+if [ "x" != "x${OUTDIR}" ] && [ -d ${OUTDIR} ]; then
+
+    # this ignores dot files like .test or .todo
+    cat ${OUTDIR}/* > ${OUTDIR}/${OUTFILE}
+
+    crontab -l > ${OUTDIR}/${CURRENTCRON}
+
+    if [ -f ${OUTDIR}/${OUTFILE} ]; then
+        if [ ! -f ${OUTDIR}/${CURRENTCRON} ] || ! diff ${OUTDIR}/${OUTFILE} ${OUTDIR}/${CURRENTCRON} ; then
+            crontab ${OUTDIR}/${OUTFILE}
+        fi
+    fi
+
+fi

@@ -1,0 +1,41 @@
+#!/bin/sh
+
+if [ "x" = "x${NIC}" ]; then
+    NIC="lo1"
+    if ! ifconfig ${NIC} >/dev/null ; then
+        ifconfig ${NIC} create
+    fi
+fi
+
+if ! iocage list -r | grep 'RELEASE' >/dev/null 2>/dev/null ; then
+    ioc-setup
+    if ! iocage list -r | grep 'RELEASE' >/dev/null 2>/dev/null ; then
+        echo "ERROR: iocage release doesn't exist, something went wrong."
+        exit 1
+    fi
+fi
+
+name=$1
+if ! iocage get tag ${name} >/dev/null 2>/dev/null; then
+    # typically only in here if deploying a single app not with _deploy_jails, eg.
+    # env NIC=lo1 IP=10.7.7.7
+    if [ "x" = "x${IP}" ]; then
+        echo "Usage: env IP=10.7.7.253 ${0##*/} name boot_on/off app_name"
+        exit 1
+    fi
+    echo "Creating: ${name} on ${NIC} w/ IP ${IP}"
+    ioc-newjail ${name} "${NIC}|${IP}"
+fi
+boot=$2
+if [ "x" = "x${boot}" ]; then
+    boot=off
+fi
+deployapp=$3
+if [ "x" = "x${deployapp}" ]; then
+    deployapp=${name}
+fi
+sysrc -f $( ioc-pathof ${name} )/etc/rc.conf.d/firstboot_jail firstboot_jail_fqdn=${FQDN}
+sysrc -f $( ioc-pathof ${name} )/etc/rc.conf.d/firstboot_jail firstboot_jail_reposrc=${REPOSRC}
+sysrc -f $( ioc-pathof ${name} )/etc/rc.conf.d/firstboot_jail firstboot_jail_deploy=${deployapp}
+iocage start ${name}
+iocage set boot=${boot} ${name}

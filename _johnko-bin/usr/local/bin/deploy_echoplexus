@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# TODO: THIS IS A WORK IN PROGRESS
+
+if [ "x" == "x${REPOSRC}" ]; then
+    REPOSRC=https://github.com/qq99
+fi
+
+MYUSER="app"
+
+# Based on https://github.com/qq99/echoplexus/blob/master/INSTALL.md
+echo "${MYUSER}:1004::::::/usr/home/${MYUSER}:/bin/sh:" | adduser -w no -f -
+pw user mod ${MYUSER} -G redis
+
+pkg install -y www/node www/npm sudo git nginx ruby ruby21-gems redis
+
+cd /usr/home/echoplexus
+if [ ! -d /usr/home/echoplexus/echoplexus ]; then
+    sudo -u ${MYUSER} -H git clone --depth 1 ${REPOSRC}/echoplexus.git /usr/home/echoplexus/echoplexus
+fi
+
+sudo -u ${MYUSER} -H npm install
+npm install -g coffee-script grunt grunt-cli supervisor bower browserify testem
+
+sudo -u ${MYUSER} -H bower install
+
+sudo -u ${MYUSER} -H gem install sass
+
+sysrc redis_enable="YES"
+
+echo
+JAILIP=`ifconfig | grep inet | awk '{print $2}'`
+echo "Visit http://${JAILIP}/"

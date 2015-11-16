@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# READY
+
+if sysctl security.jail.jailed | grep 1 >/dev/null 2>&1; then
+    echo "ERROR: Cannot run in a jail"
+    exit 1
+fi
+
+JAILNAMES="${JAILSGOOD} ${JAILSBAD} ${JAILSDEV}"
+
+echo "$JAILNAMES" \
+| while read num name ; do
+    if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
+        if [ "xsquid" != "x${name}" ]; then
+            iocage stop ${name}
+            iocage destroy -f ${name}
+        fi
+    fi
+done

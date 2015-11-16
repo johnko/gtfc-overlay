@@ -1,0 +1,102 @@
+#!/bin/sh
+
+# isntall runtime dependencies for gitlab
+
+pkg install -y \
+rubygem-unicorn rubygem-raindrops ruby21-gems ruby libyaml libffi indexinfo libedit rubygem-kgio rubygem-rack16 \
+rubygem-sanitize rubygem-crass rubygem-nokogiri libxslt libxml2 libgcrypt libgpg-error gettext-runtime rubygem-nokogumbo \
+rubygem-state_machine \
+rubygem-redcarpet \
+rubygem-activesupport41 rubygem-json rubygem-minitest rubygem-i18n rubygem-thread_safe1 rubygem-atomic rubygem-tzinfo \
+rubygem-asciidoctor \
+rubygem-gitlab_emoji rubygem-gemojione \
+rubygem-newrelic_rpm \
+rubygem-rdoc \
+rubygem-fog rubygem-fog-softlayer rubygem-fog-core rubygem-net-ssh rubygem-ruby-termios rubygem-builder32 rubygem-formatador rubygem-excon rubygem-net-scp rubygem-mime-types rubygem-fog-json rubygem-multi_json rubygem-json_pure rubygem-fog-google rubygem-fog-xml rubygem-fog-vmfusion rubygem-fission rubygem-CFPropertyList rubygem-fog-radosgw rubygem-fog-local rubygem-fog-dynect rubygem-fog-atmos rubygem-fog-sakuracloud rubygem-fog-brightbox rubygem-inflecto rubygem-fog-powerdns rubygem-fog-storm_on_demand rubygem-ipaddress rubygem-fog-ecloud rubygem-fog-riakcs rubygem-fog-aws rubygem-fog-terremark rubygem-fog-serverlove rubygem-fog-profitbricks rubygem-fog-voxel \
+rubygem-rinku \
+rubygem-creole \
+rubygem-stamp \
+rubygem-virtus rubygem-equalizer rubygem-coercible rubygem-descendants_tracker rubygem-thread_safe rubygem-axiom-types rubygem-ice_nine \
+rubygem-attr_required \
+rubygem-httpclient \
+rubygem-rugged libgit2 curl ca_root_nss libssh2 \
+rubygem-charlock_holmes icu \
+rubygem-gitlab-linguist rubygem-mime-types1 rubygem-escape_utils-rails4 \
+rubygem-jquery-atwho-rails-rails4 \
+rubygem-omniauth-bitbucket rubygem-omniauth rubygem-hashie rubygem-omniauth-oauth rubygem-oauth \
+rubygem-rack-accept \
+rubygem-multi_xml \
+rubygem-rack-mount \
+rubygem-railties41 rubygem-actionpack41 rubygem-rack-test rubygem-actionview41 rubygem-erubis rubygem-rack15 rubygem-thor \
+rubygem-six \
+rubygem-rack-cors \
+rubygem-sidetiq rubygem-ice_cube rubygem-sidekiq rubygem-redis-namespace rubygem-redis rubygem-connection_pool rubygem-celluloid rubygem-celluloid-pool rubygem-timers rubygem-hitimes rubygem-nenv rubygem-bundler rubygem-dotenv rubygem-rspec-logsplit rubygem-celluloid-extras rubygem-celluloid-essentials rubygem-celluloid-fsm rubygem-celluloid-supervision \
+rubygem-mousetrap-rails \
+rubygem-unf rubygem-unf_ext \
+rubygem-omniauth-github rubygem-omniauth-oauth2 rubygem-oauth2 rubygem-faraday rubygem-multipart-post rubygem-jwt \
+rubygem-sprockets3 \
+rubygem-sprockets rubygem-hike rubygem-tilt1 \
+rubygem-sass32 \
+rubygem-activemodel41 \
+rubygem-uglifier rubygem-execjs node python27 python2 \
+rubygem-orm_adapter \
+rubygem-bcrypt \
+rubygem-warden \
+rubygem-rack-attack \
+rubygem-tinder rubygem-twitter-stream rubygem-http_parser.rb rubygem-simple_oauth rubygem-eventmachine rubygem-faraday_middleware \
+rubygem-redis-store \
+rubygem-redis-rack \
+rubygem-activerecord41 rubygem-arel \
+redis \
+rubygem-diffy \
+rubygem-omniauth-twitter \
+rubygem-request_store \
+rubygem-settingslogic \
+rubygem-gitlab-grack \
+rubygem-gitlab_omniauth-ldap rubygem-rubyntlm rubygem-pyu-ruby-sasl rubygem-net-ldap \
+rubygem-foreman \
+rubygem-attr_encrypted rubygem-encryptor \
+rubygem-octokit rubygem-sawyer rubygem-addressable \
+rubygem-browser \
+rubygem-pg postgresql93-client \
+rubygem-turbolinks-rails41 rubygem-coffee-rails41 rubygem-coffee-script rubygem-coffee-script-source \
+rubygem-haml rubygem-tilt \
+rubygem-html2haml rubygem-ruby_parser rubygem-sexp_processor \
+rubygem-httparty \
+rubygem-omniauth-google-oauth2 \
+rubygem-omniauth-shibboleth \
+rubygem-colored \
+rubygem-version_sorter \
+rubygem-unicorn-worker-killer rubygem-get_process_mem \
+rubygem-gitlab_meta \
+rubygem-select2-rails \
+rubygem-rqrcode-rails3 rubygem-rqrcode \
+rubygem-gemnasium-gitlab-service \
+rubygem-github-markup \
+rubygem-org-ruby rubygem-rubypants \
+rubygem-raphael-rails \
+rubygem-redcloth \
+rubygem-bootstrap-sass rubygem-autoprefixer-rails rubygem-sass \
+rubygem-sqlite3 sqlite3 \
+rubygem-jbuilder-rails41 \
+rubygem-rake \
+rubygem-spring \
+rubygem-actionmailer41 rubygem-mail \
+rubygem-sdoc \
+rubygem-hipchat rubygem-mimemagic \
+rubygem-rotp \
+rubygem-gollum-lib rubygem-gollum-grit_adapter rubygem-gitlab-grit rubygem-diff-lcs rubygem-posix-spawn rubygem-stringex rubygem-rouge \
+git expat p5-Error perl5 cvsps p5-Authen-SASL p5-Digest-HMAC p5-GSSAPI p5-Net-SMTP-SSL p5-IO-Socket-SSL p5-Net-SSLeay p5-IO-Socket-IP p5-Socket p5-Mozilla-CA \
+rubygem-wikicloth rubygem-builder rubygem-htmlentities rubygem-expression_parser rubygem-twitter-text \
+rubygem-slim rubygem-temple \
+rubygem-nprogress-rails \
+rubygem-slack-notifier \
+rubygem-omniauth-saml rubygem-ruby-saml rubygem-uuid rubygem-macaddr rubygem-systemu \
+rubygem-sinatra rubygem-rack-protection \
+rubygem-underscore-rails \
+rubygem-omniauth-gitlab \
+rubygem-gitlab-flowdock-git-hook rubygem-flowdock \
+rubygem-ace-rails-ap
+
+# for the deploy_gitlab_config script
+pkg install -y sudo

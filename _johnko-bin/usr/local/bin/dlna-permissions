@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# full path to bins because called from cron
+
+if [ "x" = "x$PERSONALMNT" ]; then
+    PERSONALMNT=/vault/data
+fi
+
+CHOWNUREP="
+${PERSONALMNT}/beet
+"
+for i in ${CHOWNUREP}; do
+    if [ "x" != "x$i" ] && [ -d $i ]; then
+        /usr/bin/find $i -exec chown urep {} \;
+    fi
+done
+
+CHMODFD="
+${PERSONALMNT}/ff
+${PERSONALMNT}/movies
+${PERSONALMNT}/music
+${PERSONALMNT}/photos
+"
+for i in ${CHMODFD}; do
+    if [ "x" != "x$i" ] && [ -d $i ]; then
+        /usr/bin/find ${i} -type f -exec chmod a+r {} \;
+        /usr/bin/find ${i} -type d -exec chmod a+rx {} \;
+    fi
+done

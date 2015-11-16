@@ -1,0 +1,213 @@
+#!/bin/sh
+
+# READY
+
+if sysctl security.jail.jailed | grep 1 >/dev/null 2>&1; then
+    echo "ERROR: Cannot run in a jail"
+    exit 1
+fi
+
+if [ "x" = "x${FQDN}" ]; then
+    echo "Please set or export variable FQDN"
+    exit 1
+fi
+
+if [ "x" = "x${REPOSRC}" ]; then
+    REPOSRC=https://github.com/johnko
+fi
+
+if [ "x" = "x${GITLABSRC}" ]; then
+    GITLABSRC=https://gitlab.com/
+fi
+
+if [ "x" = "x${NIC}" ]; then
+    NIC="lo1"
+    if ! ifconfig ${NIC} >/dev/null ; then
+        ifconfig ${NIC} create
+    fi
+fi
+
+if [ "x" = "x${IPNET}" ]; then
+    IPNET="10.7.7."
+fi
+
+if [ "x" = "x${HOSTIP}" ]; then
+    HOSTIP="$( net-ip )"
+fi
+
+if [ "x" = "x${HOSTNIC}" ]; then
+    HOSTNIC="$( net-nic )"
+fi
+
+if ! iocage list -r | grep 'RELEASE' >/dev/null 2>/dev/null ; then
+    ioc-setup
+    if ! iocage list -r | grep 'RELEASE' >/dev/null 2>/dev/null ; then
+        echo "ERROR: iocage release doesn't exist, something went wrong."
+        exit 1
+    fi
+fi
+
+if [ "x" != "x${STARTCOUNT}" ]; then
+    # remove anything that's not a digit
+    count=`echo ${STARTCOUNT} | sed 's/[^[:digit:]]//g'`
+fi
+
+if [ "x" = "x${count}" ]; then
+    count=0
+fi
+
+
+
+jailip() {
+    local name
+    local num
+    JAILDATASET="${JAILSGOOD} ${JAILSDEV} ${JAILSBAD}"
+    echo "$JAILDATASET" \
+        | while read num name ; do
+            if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
+                #echo "debug: search ${1}, name ${name}"
+                if [ "x${1}" = "x${name}" ]; then
+                    RESULT=$(( count + num ))
+                    #echo "debug: match ${num}, result ${RESULT}"
+                    echo "${RESULT}"
+                fi
+            fi
+        done
+}
+
+setupnginxconfig() {
+    local name=${1}
+    local FQDN=${2}
+    cat ~/git/deploy/usr/local/etc/nginx/sites-available/nginx-all \
+        | sed "s/localhost.localdomain/${FQDN}/" \
+        >$( ioc-pathof ${name} )/usr/local/etc/nginx/sites-enabled/${name}
+    chmod 644 $( ioc-pathof ${name} )/usr/local/etc/nginx/sites-enabled/${name}
+}
+
+case ${1} in
+    good)
+        JAILNAMES="${JAILSGOOD}"
+        ;;
+    bad)
+        JAILNAMES="${JAILSBAD}"
+        ;;
+    dev)
+        JAILNAMES="${JAILSDEV}"
+        ;;
+    nginx)
+        env IPNET="${IPNET}" HOSTIP="${HOSTIP}" HOSTNIC="${HOSTNIC}" _deploy_pf_ucarp
+        setupnginxconfig nginx ${FQDN}
+        exit
+        ;;
+    *)
+        echo "ERROR: $0 [good|bad|dev|nginx]"
+        exit 1
+        ;;
+esac
+
+allowsysvipc() {
+    iocage set allow_sysvipc=1 ${1}
+}
+
+copysslselfcert() {
+    if [ "x" != "x${HTTP_PROXY}" ]; then
+        PROXYIP=$( echo $HTTP_PROXY | awk -F/ '{print $NF}' | awk -F: '{print $1}' )
+        if [ "x10.7.7.1" = "$PROXYIP" ]; then
+            cat $( ioc-pathof squid )/usr/local/etc/squid/public.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
+        else
+            curl --output $( ioc-pathof ${1} )/root/public-${PROXYIP}.pem http://${PROXYIP}:3127/public.pem
+            cat           $( ioc-pathof ${1} )/root/public-${PROXYIP}.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
+        fi
+    else
+        cat $( ioc-pathof squid )/usr/local/etc/squid/public.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
+    fi
+}
+
+copy_var_ports() {
+    name=$1
+    if [ -e /var/ports ]; then
+        rsync -qalmP --exclude work /var/ports/ $( ioc-pathof ${name} )/var/ports/
+    fi
+}
+
+save_var_ports() {
+    name=$1
+    rsync -qalmP --exclude work $( ioc-pathof ${name} )/var/ports/ /var/ports/
+}
+
+env IPNET="${IPNET}" HOSTIP="${HOSTIP}" HOSTNIC="${HOSTNIC}" _deploy_pf_ucarp
+
+echo "$JAILNAMES" \
+    | while read num name boot ; do
+    if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
+        if ! iocage get tag ${name} >/dev/null 2>/dev/null; then
+            # The following case can be in any order
+            case ${name} in
+                # GOOD JAILNAMES
+                squid)
+                    copy_var_ports ${name}
+                                            env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
+                    save_var_ports ${name}
+                    ;;
+                nginx)
+                                            env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
+                    setupnginxconfig ${name} ${FQDN}
+                    ;;
+                easydnsclient)              env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                couch|couchdb)              env IP=${IPNET}${num}  _deploy_app ${name} ${boot} couchdb ;;
+                dtfc|uploadsh|transfersh)   env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                mdwiki)                     env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                piwik)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                ejabberd)                   env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                murmur)                     env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                vnc)                        env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                klaus)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                smtp)                       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} postfix ;;
+                imap)                       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} dovecot ;;
+                owncloud)
+                    if [         -d /root/local/owncloud ]; then
+                        mkdir -p                          $( ioc-pathof ${name} )/root/local/owncloud
+                        rsync -qalmP /root/local/owncloud/ $( ioc-pathof ${name} )/root/local/owncloud/
+                    fi
+                    allowsysvipc ${name}
+                                            env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
+                    rsync -qalmP $( ioc-pathof ${name} )/root/local/owncloud/ /root/local/owncloud/
+                    ;;
+                gitlab)
+                    copy_var_ports ${name}
+                    allowsysvipc ${name}
+                    ## only if we are installing via src to cache rubygems
+                    #copysslselfcert ${name}
+                    # Set jail ip as FQDN so git-shell works
+                    grep -v " ${FQDN}" $( ioc-pathof ${name} )/etc/hosts >$( ioc-pathof ${name} )/etc/hosts.tmp
+                    cat $( ioc-pathof ${name} )/etc/hosts.tmp >$( ioc-pathof ${name} )/etc/hosts
+                    echo "${IPNET}`jailip gitlab` ${FQDN}" >>$( ioc-pathof ${name} )/etc/hosts
+                                            env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}_config
+                    ;;
+                builder|buildersquidpkg|builderffmpegpkg|buildgitlabpkg)
+                    copy_var_ports ${name}
+                                            env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
+                    save_var_ports ${name}
+                    ;;
+                # DEV JAILNAMES
+                monit)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                zabbix)                     env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                echoplexus)                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                gitannex)                   env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                gogs)                       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}_src ;;
+                phabricator)                env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                pydio)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                # BAD JAILNAMES
+                baikal)                     env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                couchdtfc|couchdbdtfc)      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} couchdbdtfc ;;
+                horde)
+                    allowsysvipc ${name}
+                                            env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}webmail
+                    ;;
+            esac
+            if [ "xsquid" != "x${name}" ]; then
+                iocage stop ${name}
+            fi
+        fi # end of if not jail exists
+    fi # end of if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
+done

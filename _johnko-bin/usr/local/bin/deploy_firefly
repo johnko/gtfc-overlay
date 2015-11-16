@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# READY
+
+if sysctl security.jail.jailed | grep 1 >/dev/null 2>&1; then
+    echo "ERROR: Multicast udp 5353 has issues reaching a jail"
+    echo "ERROR: Clients will not detect this in a jail"
+    exit 1
+fi
+
+pkg install -y audio/firefly
+
+if ! which mt-daapd ; then
+    echo "ERROR: install failed"
+    exit 1
+fi
+
+install -m 644 ~/git/deploy/usr/local/etc/firefly/mt-daapd.conf /usr/local/etc/firefly/mt-daapd.conf
+
+deploy_dlna-permissions
+
+# sysrc -f /etc/rc.conf.d/firefly firefly_enable="YES"
+
+service mt-daapd onestart
+
+echo
+echo "Scan the network with a DAAP client like iTunes"

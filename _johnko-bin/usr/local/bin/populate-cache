@@ -1,0 +1,40 @@
+#!/bin/sh
+
+PKGLISTTODO="
+firefly
+minidlna
+
+madsonic-standalone
+
+kodi
+
+icinga2
+nagios4
+zabbix24-server zabbix24-agent zabbix24-frontend
+monit
+
+suricata
+ossec-hids-server ossec-hids-client ossec-hids-local
+snort
+
+pg_activity
+mirmon
+ntop
+arpalert
+conky
+gamin
+"
+
+if [ -e $HOME/local/pkglist ]; then
+    PKGLIST="`cat $HOME/local/pkglist | grep -v '^#' | tr ' ' '\n' | sort -u | grep -v '^\$'`"
+elif [ -e $HOME/perm/pkglist ]; then
+    PKGLIST="`cat $HOME/perm/pkglist | grep -v '^#' | tr ' ' '\n' | sort -u | grep -v '^\$'`"
+fi
+
+for i in ${PKGLIST} ${PKGLISTTODO} ; do
+    pkg install -y ${i}
+    pkg remove -a -y
+    if [ -e /var/cache/pkg ]; then
+        rm /var/cache/pkg/*.txz
+    fi
+done

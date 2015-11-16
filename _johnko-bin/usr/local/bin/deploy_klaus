@@ -1,0 +1,63 @@
+#!/bin/sh
+
+# Ready
+
+if [ "x" == "x${FQDN}" ]; then
+    echo "Please set or export variable FQDN"
+    exit 1
+fi
+
+deploy_nginx
+
+pkg install -y py27-pip sudo
+
+# install the gitosis app and user
+pkg install -y py27-gitosis
+# remove the gitosis app, but keep the user
+pkg remove -y py27-gitosis
+
+pip install waitress klaus markdown watchdog
+
+mkdir -p /var/run/klaus && chown www:www /var/run/klaus
+
+install -d -o git -g git -m 700 /usr/local/git/.ssh
+install -o git -g git -m 600 /root/.ssh/authorized_keys /usr/local/git/.ssh/authorized_keys
+
+install -d -o git -g git -m 755 /usr/local/git/repos
+
+. ~/git/deploy/scripts/git_conf
+echo "${PROJECTS}" \
+| while read name ; do
+    if [ "x" != "x${name}" ]; then
+        sudo -u git -H mkdir /usr/local/git/repos/${name}
+        cd /usr/local/git/repos/${name}
+        sudo -u git -H git init --bare
+    fi
+done
+
+cat ~/git/deploy/usr/local/etc/nginx/sites-available/klaus \
+| sed "s/localhost.localdomain/${FQDN}/" \
+>/usr/local/etc/nginx/sites-enabled/klaus
+chmod 644 /usr/local/etc/nginx/sites-enabled/klaus
+sysrc nginx_enable="YES"
+service nginx start
+
+#| sed "s/0.0.0.0/${JAILIP}/" \
+cat ~/git/deploy/usr/local/lib/python2.7/site-packages/klauswsgireload.py \
+| sed "s;unrelenting.technology;${FQDN};" \
+| sed "s;/home/freebsd/src/github.com/myfreeweb;/usr/local/git/repos;" \
+>/usr/local/lib/python2.7/site-packages/klauswsgireload.py
+
+install -m 755 ~/git/deploy/usr/local/etc/rc.d/klaus /usr/local/etc/rc.d/klaus
+
+if sysctl security.jail.jailed | grep 1 >/dev/null ; then
+    cat /etc/ssh/sshd_config \
+    | sed 's/#Port 22/Port 23/' \
+    >/etc/ssh/sshd_config.tmp
+    cat /etc/ssh/sshd_config.tmp >/etc/ssh/sshd_config
+    rm /etc/ssh/sshd_config.tmp
+fi
+sshd-config
+service sshd start
+
+JAILIP=$( ifconfig | grep inet | awk '{print $2}' )

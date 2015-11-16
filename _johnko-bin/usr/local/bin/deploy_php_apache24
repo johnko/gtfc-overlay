@@ -1,0 +1,11 @@
+#!/bin/sh
+
+deploy_apache24
+
+pkg install -y lang/php56
+
+pkg install -fy www/mod_php56
+
+#sysrc php_fpm_enable="YES"
+
+#service php-fpm start

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# READY
+
+for i in $( service -l | grep '^ucarp' ) ; do
+    if [ -e /etc/rc.conf.d/${i} ]; then
+        sysrc -f /etc/rc.conf.d/${i} ${i}_enable="YES"
+    fi
+    service ${i} onestart
+done

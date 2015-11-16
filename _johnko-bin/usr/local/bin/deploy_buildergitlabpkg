@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# READY
+
+# unattended build
+export BATCH=yes
+
+
+if [ "x" == "x${REPOSRC}" ]; then
+    REPOSRC=https://github.com/johnko
+fi
+
+
+if [ ! -d ${HOME}/gitlabports ]; then
+    git clone --depth 1 ${REPOSRC}/freebsd-ports-test.git -b gitlab-7.14.1 ${HOME}/gitlabports
+fi
+rsync -virthP --exclude .git  ${HOME}/gitlabports/  /usr/ports/
+
+
+build_it_now() {
+    ## don't run portsnap
+    # psnap
+    mkdir -p /var/ports/packages/All
+    echo "building ${1}"
+    safename=$( echo "${1}" | tr / _ )
+    if [ -e /var/db/ports/${safename}/options ]; then
+        rm /var/db/ports/${safename}/options
+    fi
+    cd /usr/ports/${1}
+    make && make install && make package \
+    && cp /var/ports/usr/ports/${1}/work/pkg/*.txz /var/ports/packages/All/ \
+    && make clean
+    ## see /var/ports/packages/All/
+}
+
+
+## install dependencies
+deploy_gitlab_runtimedeps
+
+# Build dependencies
+deploy_gitlab_builddeps
+
+PORTPATHS="
+www/rubygem-activeresource4-rails41
+www/rubygem-acts-as-taggable-on3-rails41
+www/rubygem-asana-rails41
+www/rubygem-cal-heatmap-rails0-rails41
+www/rubygem-carrierwave-rails41
+www/rubygem-d3_rails-rails41
+devel/rubygem-default_value_for-rails41
+devel/rubygem-devise-async-rails41
+devel/rubygem-devise-rails41
+security/rubygem-devise-two-factor-rails41
+security/rubygem-doorkeeper-rails41
+www/rubygem-dropzonejs-rails41
+devel/rubygem-enumerize-rails41
+devel/rubygem-font-awesome-rails-rails41
+devel/rubygem-gitlab_git-rails41
+www/rubygem-gon-rails41
+devel/rubygem-grape-entity-rails41
+devel/rubygem-grape-rails41
+www/rubygem-haml-rails-rails41
+textproc/rubygem-html-pipeline-rails41
+www/rubygem-jquery-rails-rails41
+www/rubygem-jquery-rails41
+www/rubygem-jquery-scrollto-rails41
+www/rubygem-jquery-turbolinks-rails41
+www/rubygem-jquery-ui-rails-rails41
+www/rubygem-kaminari-rails41
+security/rubygem-rack-oauth2-rails41
+devel/rubygem-rails-deprecated_sanitizer-rails41
+textproc/rubygem-rails-dom-testing-rails41
+devel/rubygem-rails-observers-rails41
+www/rubygem-rails41
+databases/rubygem-redis-actionpack-rails41
+devel/rubygem-redis-activesupport-rails41
+www/rubygem-redis-rails41
+www/rubygem-responders1
+textproc/rubygem-sass-rails41
+databases/rubygem-seed-fu-rails41
+devel/rubygem-sprockets-rails41
+www/rubygem-task_list-rails41
+www/gitlab/
+"
+
+for i in ${PORTPATHS} ; do
+    if [ "x" != "x${i}" ] && [ -d ${i} ]; then
+        build_it_now ${i}
+    fi
+done

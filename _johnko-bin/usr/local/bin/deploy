@@ -1,0 +1,27 @@
+#!/bin/sh
+
+BINDIR=${HOME}/bin
+
+usage() {
+    # list available apps
+    cat <<EOF
+Usage: deploy app_name
+
+Available apps
+EOF
+    for i in `ls ${BINDIR}/deploy_*` ; do
+        echo "- ${i}" | sed "s/\/.*\/deploy_//"
+    done
+    exit 1
+}
+
+if [ "x" == "x${1}" ]; then
+    usage
+else
+    if [ -e ${BINDIR}/deploy_${1} ]; then
+        sh ${BINDIR}/deploy_${1} ${2}
+        exit $?
+    else
+        usage
+    fi
+fi

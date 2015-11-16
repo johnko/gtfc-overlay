@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# be root or exit
+if [ "0" != "`id -u`" ]; then
+    exit 1
+fi
+
+REPODIR=~/git/newsyslog.conf.d
+CONFDIR=/usr/local/etc/newsyslog.conf.d
+
+install -d -m 755 ${CONFDIR}
+
+for i in `ls -1 ${REPODIR}${CONFDIR}` ; do
+    if [ -f     ${REPODIR}${CONFDIR}/${i} ]; then
+        install -C -m 644 \
+                ${REPODIR}${CONFDIR}/${i} \
+                          ${CONFDIR}/${i}
+    fi
+done
+
+if [ -f /usr/local/etc/newsyslog.conf.d/firefly.conf ]; then
+    # we use syslogd instead
+    rm /usr/local/etc/newsyslog.conf.d/firefly.conf
+fi
+
+crontabbed
+
+cat > ~/crontabbed/newsyslog_hourly <<EOF
+1 * * * * newsyslog
+EOF
+
+crontabbed

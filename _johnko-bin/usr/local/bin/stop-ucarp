@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# READY
+
+for i in $( service -l | grep '^ucarp' ) ; do
+    service ${i} onestop
+done

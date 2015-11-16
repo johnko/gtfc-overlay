@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if which gpg >/dev/null 2>&1 ; then
+	if [ -e $HOME/.gnupg/gpg.conf ]; then
+		if ! grep 'no-secmem-warning' $HOME/.gnupg/gpg.conf >/dev/null 2>&1 ; then
+			if swapctl -l | grep -v 'Device.*Used' | grep 'swap.eli' >/dev/null 2>&1 ; then
+				echo 'no-secmem-warning' >>$HOME/.gnupg/gpg.conf
+			fi
+		fi
+	fi
+	if [ -e /builder-pubkey.asc ]; then
+		gpg --with-fingerprint /builder-pubkey.asc | /usr/bin/sed \
+		-e 's;  ; ;g' \
+		-e 's;  ; ;g' \
+		-e 's;  ; ;g' \
+		-e 's;  ; ;g' \
+		-e 's;  ; ;g' \
+		-e 's;  ; ;g' \
+		-e 's;  ; ;g'
+	fi
+fi

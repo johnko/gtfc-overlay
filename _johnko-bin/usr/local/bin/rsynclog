@@ -1,0 +1,183 @@
+#!/bin/sh
+
+NOW=`date -u +%y%m%d-%H%M%S`
+
+# defaults
+THISNAME="${0##*/}"
+LOGPATH=/tmp/`whoami`/${THISNAME}
+FILELIST="${HOME}/local/${THISNAME}_filelist.txt"
+EXCLUDEFILE="${HOME}/local/${THISNAME}_exclude.txt"
+INCLUDEFILE="${HOME}/local/${THISNAME}_include.txt"
+RTYPE="LAN"
+
+usage() {
+    echo "Usage: $0 [-n] [-w] [c-] [-D] [-l log_path] [-x exclude_list]"
+    echo "       [-p 22] [-i id_rsa] [-k known_hosts]"
+    echo "       [-d link-dest] -s source -t target"
+}
+
+
+while getopts l:f:x:I:s:t:d:p:i:k:nwcD o; do
+    case "$o" in
+        l) LOGPATH="${OPTARG}" ;;
+        f) FILELIST="${OPTARG}" ;;
+        x) EXCLUDEFILE="${OPTARG}" ;;
+        I) INCLUDEFILE="${OPTARG}" ;;
+        s) SOURCE="${OPTARG}" ;;
+        t) TARGET="${OPTARG}" ;;
+        d) LINKDEST="${OPTARG}" ;;
+        p) SSHPORT="-p ${OPTARG}" ;;
+        i) SSHIDENTITY="-i ${OPTARG}" ;;
+        k) SSHKNOWNHOSTS="-o UserKnownHostsFile=${OPTARG}" ;;
+        n) DRYRUN="--dry-run" ;;
+        w) RTYPE="WAN" ;;
+        c) CHECKSUM="--checksum" ;;
+        D) DELETEDURING="--delete-during" ;;
+        [?]) usage; exit 1 ;;
+    esac
+done
+
+
+if [ "x" == "x${SOURCE}" ]; then
+    echo "ERROR: SOURCE undefined."
+    exit 1
+fi
+if [ "x" == "x${TARGET}" ]; then
+    echo "ERROR: TARGET undefined."
+    exit 1
+fi
+if which rsync > /dev/null ; then
+    RSYNC=`which rsync`
+else
+    echo "ERROR: rsync not found in PATH."
+    exit 1
+fi
+LOGFILE="${LOGPATH}/${NOW}.log"
+if [ ! -d "${LOGPATH}" ]; then
+    mkdir -p "${LOGPATH}"
+    if [ ! -d "${LOGPATH}" ]; then
+        echo "ERROR: ${LOGPATH} is not a folder."
+        exit 1
+    fi
+fi
+if [ ! -d "${FILELIST%/*}" ]; then
+    mkdir -p "${FILELIST%/*}"
+    if [ ! -d "${FILELIST%/*}" ]; then
+        echo "ERROR: ${FILELIST%/*} is not a folder."
+        exit 1
+    fi
+fi
+if [ -e "${FILELIST}" ]; then
+    FILESOPTION="--files-from=${FILELIST}"
+fi
+if [ ! -d "${EXCLUDEFILE%/*}" ]; then
+    mkdir -p "${EXCLUDEFILE%/*}"
+    if [ ! -d "${EXCLUDEFILE%/*}" ]; then
+        echo "ERROR: ${EXCLUDEFILE%/*} is not a folder."
+        exit 1
+    fi
+fi
+if [ -e "${EXCLUDEFILE}" ]; then
+    EXCLUDEOPTION="--exclude-from=${EXCLUDEFILE}"
+fi
+if [ ! -d "${INCLUDEFILE%/*}" ]; then
+    mkdir -p "${INCLUDEFILE%/*}"
+    if [ ! -d "${INCLUDEFILE%/*}" ]; then
+        echo "ERROR: ${INCLUDEFILE%/*} is not a folder."
+        exit 1
+    fi
+fi
+if [ -e "${INCLUDEFILE}" ]; then
+    INCLUDEOPTION="--include-from=${INCLUDEFILE}"
+fi
+if [ "x" != "x${LINKDEST}" ]; then
+    LDOPTION="--link-dest=${LINKDEST}"
+fi
+if [ "xWAN" == "x${RTYPE}" ]; then
+    WANOPTIONS="--bwlimit=300 --timeout=1800 --compress-level=9 --compress"
+elif [ "xLAN" == "x${RTYPE}" ]; then
+    LANOPTIONS=""
+fi
+
+cat >/dev/null <<EOF
+
+    --dry-run \
+    --links \
+    #--inplace \
+    #--hard-links \
+    #--bwlimit=300 \
+    #--timeout=1800 \
+    #--delete-during \
+    #--exclude-from=FILE \
+    #--exclude=PATTERN \
+    #--link-dest=DIR \
+    #--log-file="${LOGFILE}" \
+    #--compress-level=9 \
+    #--compress \
+    --stats \
+    --partial \
+    --progress \
+    #--checksum \
+    --rsh="ssh -p${SSHPORT}" \
+    --human-readable \
+    --itemize-changes \
+    --recursive \
+    --times \
+    --verbose \
+
+EOF
+
+
+tee -a "${LOGFILE}" <<EOF
+start of log
+`date -u +%y%m%d-%H%M%S`
+LOGFILE=       ${LOGFILE}
+SSHPORT=       ${SSHPORT}
+SSHIDENTITY=   ${SSHIDENTITY}
+SSHKNOWNHOSTS= ${SSHKNOWNHOSTS}
+RSYNC=         ${RSYNC}
+DRYRUN=        ${DRYRUN}
+FILESOPTION=   ${FILESOPTION}
+EXCLUDEOPTION= ${EXCLUDEOPTION}
+INCLUDEOPTION= ${INCLUDEOPTION}
+LDOPTION=      ${LDOPTION}
+WANOPTIONS=    ${WANOPTIONS}
+LANOPTIONS=    ${LANOPTIONS}
+CHECKSUM=      ${CHECKSUM}
+DELETEDURING=  ${DELETEDURING}
+SOURCE=        ${SOURCE}
+TARGET=        ${TARGET}
+EOF
+
+
+${RSYNC} \
+    ${DRYRUN} \
+    ${FILESOPTION} \
+    ${EXCLUDEOPTION} \
+    ${INCLUDEOPTION} \
+    ${LDOPTION} \
+    ${WANOPTIONS} \
+    ${LANOPTIONS} \
+    ${CHECKSUM} \
+    ${DELETEDURING} \
+    --chmod=u=rwX \
+    --links \
+    --inplace \
+    --stats \
+    --partial \
+    --progress \
+    --rsh="ssh ${SSHPORT} ${SSHIDENTITY} ${SSHKNOWNHOSTS}" \
+    --human-readable \
+    --itemize-changes \
+    --recursive \
+    --times \
+    --verbose \
+    "${SOURCE}" \
+    "${TARGET}" \
+| tee -a "${LOGFILE}"
+
+
+tee -a "${LOGFILE}" <<EOF
+`date -u +%y%m%d-%H%M%S`
+end of log
+EOF

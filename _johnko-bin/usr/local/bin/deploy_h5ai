@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# TODO
+
+if [ "x" == "x${REPOSRC}" ]; then
+    REPOSRC=https://github.com/johnko
+fi
+
+if [ "x" == "x${FQDN}" ]; then
+    echo "Please set or export variable FQDN" 2>&1
+    exit 1
+fi
+
+MYUSER="app"
+
+deploy_php_nginx
+
+pkg install -y lang/go sudo
+
+echo "${MYUSER}:1004::::::/usr/home/${MYUSER}:/bin/sh:" | adduser -w no -f -
+
+cd /usr/home/${MYUSER}
+if [ ! -d /usr/home/${MYUSER}/src ]; then
+    sudo -u ${MYUSER} -i -- git clone --depth 1 ${REPOSRC}/h5ai.git /usr/home/${MYUSER}/src
+fi
+
+cd /usr/home/${MYUSER}/src
+sh scripts/install.sh
+
+cat ~/git/deploy/usr/local/etc/nginx/sites-available/uploadsh \
+| sed "s/localhost.my.domain/${FQDN}/" \
+>/usr/local/etc/nginx/sites-enabled/uploadsh
+
+service nginx restart
+
+echo
+echo "Visit https://${FQDN}/h5ai/"

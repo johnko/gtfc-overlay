@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# TODO: THIS IS A WORK IN PROGRESS
+# Probably will not use because too many extra features and requires its own domain
+
+pkg install -y devel/phabricator
+
+echo
+JAILIP=`ifconfig | grep inet | awk '{print $2}'`
+echo "Visit http://${JAILIP}/"

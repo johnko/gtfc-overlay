@@ -1,0 +1,81 @@
+#!/bin/sh
+
+ram-pagesize () {
+  sysctl -n hw.pagesize
+}
+
+ram-total() {
+  case `uname -s` in
+    Darwin)
+      sysctl -n hw.memsize | awk '{ printf "%.1f\n", $1 / 1073741824 }'
+    ;;
+    FreeBSD)
+      echo $( sysctl -n vm.stats.vm.v_page_count )" "$( ram-pagesize ) | \
+      awk '{ printf "%.1f\n", $1 * $2 / 1073741824 }'
+    ;;
+  esac
+}
+
+ram-totalpage() {
+  case `uname -s` in
+    FreeBSD)
+      # round total ram up
+      echo $( sysctl -n vm.stats.vm.v_page_count )" "$( ram-pagesize ) | \
+      awk '{ printf "%.1f\n", $1 * $2 }'
+    ;;
+  esac
+}
+
+ram-freepage() {
+  case `uname -s` in
+    Darwin)
+      echo $( sysctl -n vm.page_free_count )" "$( ram-pagesize ) | \
+      awk '{ printf "%.1f\n", $1 * $2 }'
+    ;;
+    FreeBSD)
+      echo $( sysctl -n vm.stats.vm.v_free_count )" "$( ram-pagesize ) | \
+      awk '{ printf "%.1f\n", $1 * $2 }'
+    ;;
+  esac
+}
+
+ram-free() {
+  case `uname -s` in
+    Darwin)
+      echo $( ram-freepage ) | \
+      awk '{ printf "%.1f\n", $1 / 1000000000 }'
+    ;;
+    FreeBSD)
+      echo $( ram-freepage ) | \
+      awk '{ printf "%.1f\n", $1 / 1073741824 }'
+    ;;
+  esac
+}
+
+ram-used() {
+  case `uname -s` in
+    Darwin)
+      echo $( ram-total )" "$( ram-free ) | \
+      awk '{ printf "%.1f\n", $1 - $2 }'
+    ;;
+    FreeBSD)
+      echo $( ram-totalpage )" "$( ram-freepage ) | \
+      awk '{ printf "%.1f\n", ( $1 - $2 ) / 1073741824 }'
+    ;;
+  esac
+}
+
+ram-percent() {
+  case `uname -s` in
+    Darwin)
+      echo $( ram-used )" "$( ram-total ) | \
+      awk '{ printf "%.1f\n", $1 * 100 / $2 }'
+    ;;
+    FreeBSD)
+        echo $( ram-used )" "$( ram-total ) | \
+        awk '{ printf "%.1f\n", $1 * 100 / $2 }'
+    ;;
+  esac
+}
+
+echo $( ram-total )"G "$( ram-used )"G "$( ram-free )"G "$( ram-percent )"%"

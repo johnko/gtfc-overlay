@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# READY
+
+service minidlna onestop
+service mt-daapd onestop

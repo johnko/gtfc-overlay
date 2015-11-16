@@ -1,0 +1,4 @@
+#!/bin/sh
+
+uptime | \
+  egrep -o "[0-9]+ users?"

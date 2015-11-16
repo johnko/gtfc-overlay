@@ -1,0 +1,63 @@
+#!/bin/sh
+
+if [ "x" == "x${SQUID}" ]; then
+    echo "env SQUID not set, defaulting to 10.7.7.1:3128"
+    SQUID="10.7.7.1:3128"
+fi
+
+if [ "0" = "`id -u`" ]; then
+    # Thanks to @tomster via https://github.com/freebsd/pkg/issues/1181
+    install -d -m 755 /usr/local/etc
+    cat >/usr/local/etc/pkg.conf <<EOF
+# Sample alias settings
+ALIAS              : {
+  all-depends: query %dn-%dv,
+  annotations: info -A,
+  build-depends: info -qd,
+  cinfo: info -Cx,
+  comment: query -i "%c",
+  csearch: search -Cx,
+  desc: query -i "%e",
+  download: fetch,
+  iinfo: info -ix,
+  isearch: search -ix,
+  prime-list: "query -e '%a = 0' '%n'",
+  leaf: "query -e '%#r == 0' '%n-%v'",
+  list: info -ql,
+  noauto = "query -e '%a == 0' '%n-%v'",
+  options: query -i "%n - %Ok: %Ov",
+  origin: info -qo,
+  provided-depends: info -qb,
+  raw: info -R,
+  required-depends: info -qr,
+  roptions: rquery -i "%n - %Ok: %Ov",
+  shared-depends: info -qB,
+  show: info -f -k,
+  size: info -sq,
+}
+PKG_ENV : {
+  HTTP_PROXY: "http://${SQUID}",
+  HTTPS_PROXY: "http://${SQUID}"
+}
+EOF
+    chmod 644 /usr/local/etc/pkg.conf
+fi
+
+
+if [ ! -d ~/local ]; then
+    # are you root?
+    if [ "0" = "`id -u`" ]; then
+        NEWDATASET=`zfs list | grep -o '^[[:alnum:]]*/root/bin' | sed 's/bin/local/'`
+        if [ "x" != "x${NEWDATASET}" ]; then
+            zfs create -o exec=off -o setuid=off ${NEWDATASET}
+        fi
+    fi
+    if [ ! -d ~/local ]; then
+        install -d -m 700 ~/local
+    fi
+fi
+
+
+echo "setenv HTTP_PROXY \"http://${SQUID}\"" >~/local/cshproxy
+
+echo "You may have to log out/in, or source ~/local/cshproxy"
