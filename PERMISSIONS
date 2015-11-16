@@ -6,6 +6,7 @@
 
 /etc                                                      root      wheel     755
 /etc/motd                                                 root      wheel     644
+/etc/nsswitch.conf                                        root      wheel     644
 /etc/periodic.conf                                        root      wheel     644
 
 /etc/pf                                                   root      wheel     755
@@ -20,6 +21,7 @@
 /etc/rc.conf.d/ftp-proxy                                  root      wheel     644
 /etc/rc.conf.d/hostname                                   root      wheel     644
 /etc/rc.conf.d/mdnsd                                      root      wheel     644
+/etc/rc.conf.d/mdnsresponderposix                         root      wheel     644
 /etc/rc.conf.d/netwait                                    root      wheel     644
 /etc/rc.conf.d/network                                    root      wheel     644
 /etc/rc.conf.d/ntpdate                                    root      wheel     644
@@ -297,3 +299,6 @@
 /usr/local/bin/zss                                        root      wheel     755
 /usr/local/bin/zvg                                        root      wheel     755
 /usr/local/bin/zvg-random-key                             root      wheel     755
+
+/usr/local/etc                                            root      wheel     755
+/usr/local/etc/mdnsresponder.conf                         root      wheel     644
