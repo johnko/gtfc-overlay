@@ -38,7 +38,6 @@
 /etc/ssh                                                  root      wheel     755
 /etc/ssh/ssh_config                                       root      wheel     644
 /etc/ssh/sshd_config                                      root      wheel     644
-
 /etc/sysctl.conf                                          root      wheel     644
 /etc/syslog.conf                                          root      wheel     644
 
@@ -63,7 +62,7 @@
 /usr/home/_sshtunl/crontabbed                             _sshtunl  _sshtunl  700
 /usr/home/_sshtunl/crontabbed/0_PATH                      _sshtunl  _sshtunl  600
 /usr/home/_sshtunl/crontabbed/0_SHELL                     _sshtunl  _sshtunl  600
-/usr/home/_sshtunl/crontabbed/ssh-tunnel-all-everyminute  _sshtunl  _sshtunl  600
+/usr/home/_sshtunl/crontabbed/everyminute-ssh-tunnel-all  _sshtunl  _sshtunl  600
 
 /usr/home/urep                                            urep      urep      700
 /usr/home/urep/.ssh                                       urep      urep      700
