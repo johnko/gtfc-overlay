@@ -302,6 +302,3 @@
 
 /usr/local/etc                                            root      wheel     755
 /usr/local/etc/mdnsresponder.conf                         root      wheel     644
-
-/usr/local/etc/rc.d                                       root      wheel     755
-/usr/local/etc/rc.d/mdnsd                                 root      wheel     555
