@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BINDIR=${HOME}/bin
+BINDIR=/usr/local/bin
 
 usage() {
     # list available apps
