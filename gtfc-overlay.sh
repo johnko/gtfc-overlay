@@ -24,7 +24,7 @@ backup_myconfig(){
                 | sed "s;^$GITCLUSTERPATH/$i;;" \
                 | sort \
                 | while read path; do
-                    if [ -d $path ] && [ ! -d $GITCLUSTERPATH/${CONFIGPATH}$path ]; then
+                    if [ -d $path ] && [ ! -e $GITCLUSTERPATH/${CONFIGPATH}$path ]; then
                         #echo mkdir -p $GITCLUSTERPATH/${CONFIGPATH}$path
                              mkdir -p $GITCLUSTERPATH/${CONFIGPATH}$path
                     elif [ -f $path ]; then
@@ -46,7 +46,7 @@ apply_myconfig(){
         | sort \
         | while read configpath; do
             INSTALLPATH=$( echo $configpath | sed "s;^$GITCLUSTERPATH/$i;;" )
-            if [ -d $configpath ] && [ ! -d $INSTALLPATH ]; then
+            if [ -d $configpath ] && [ ! -e $INSTALLPATH ]; then
                 #echo mkdir -p $INSTALLPATH
                      mkdir -p $INSTALLPATH
             elif [ -f $configpath ]; then
