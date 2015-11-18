@@ -77,9 +77,6 @@ ch_own_mod(){
     chmod $4 $1
 }
 
-# crontabbed create folder for users
-users_crontabbed
-
 # save pf tables in case needed for backup
 which pf-table >/dev/null 2>&1 && pf-table save all >/dev/null 2>&1
 
