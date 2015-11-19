@@ -11,12 +11,12 @@ if [ "x" = "x${IPNET}" ]; then
     IPNET="10.7.7."
 fi
 
-if [ "x" = "x${HOSTIP}" ]; then
-    HOSTIP="$( net-ip )"
-fi
-
 if [ "x" = "x${HOSTNIC}" ]; then
     HOSTNIC="$( net-nic )"
+fi
+
+if [ "x" = "x${HOSTIP}" ]; then
+    HOSTIP="$( net-ip $HOSTNIC )"
 fi
 
 if [ "x" != "x${STARTCOUNT}" ]; then
