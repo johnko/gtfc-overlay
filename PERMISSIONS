@@ -49,6 +49,22 @@
 /root/.ssh/authorized_keys                                root      wheel     600
 /root/.ssh/authorized_keys2                               root      wheel     600
 
+/root/crontabbed                                          root      wheel     700
+/root/crontabbed/0_PATH                                   root      wheel     600
+/root/crontabbed/0_SHELL                                  root      wheel     600
+/root/crontabbed/newsyslog_hourly                         root      wheel     600
+/root/crontabbed/zsnapple_pool_hourly                     root      wheel     600
+
+/root/perm                                                root      wheel     700
+/root/perm/cshalias                                       root      wheel     600
+/root/perm/cshvars                                        root      wheel     600
+/root/perm/notes                                          root      wheel     600
+/root/perm/pkglist                                        root      wheel     600
+/root/perm/tmux.conf.prettyline                           root      wheel     600
+/root/perm/tmux.conf.simpleline                           root      wheel     600
+/root/perm/zfsboot.dl                                     root      wheel     600
+/root/perm/zfsboot.orig                                   root      wheel     600
+
 /usr                                                      root      wheel     755
 /usr/home                                                 root      wheel     755
 
