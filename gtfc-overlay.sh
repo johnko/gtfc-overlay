@@ -17,8 +17,8 @@ TMPOLDDIR=/tmp/`whoami`/.old
 TMPNEWDIR=/tmp/`whoami`/.new
 
 backup_myconfig(){
-    CONFIGPATH=$1
-    CONFIGS="$2"
+    local CONFIGPATH=$1
+    local CONFIGS="$2"
     if [ ! -d $CONFIGPATH ]; then
         mkdir $CONFIGPATH
         for i in $CONFIGS; do
@@ -43,8 +43,8 @@ backup_myconfig(){
 }
 
 apply_myconfig(){
-    i=$1
-    MYINSTALLPREFIX=$2
+    local i=$1
+    local MYINSTALLPREFIX=$2
     if [ -d $GITCLUSTERPATH/$i ]; then
         find $GITCLUSTERPATH/$i -mindepth 1 \
         | sort \
@@ -82,10 +82,20 @@ ch_own_mod(){
 }
 
 apply_config_loop(){
-    DESTDIR=$1
+    local DESTDIR=$1
     for template in _base-all $MYROLES $MYDOMAIN $MYHOST ; do
         apply_myconfig $template $DESTDIR
     done
+}
+
+compare_old_new(){
+    PATTERN=$1
+    local FOUND=$( diff -r $TMPOLDDIR $TMPNEWDIR | grep $PATTERN | head -1 )
+    if [ "x" = "x$FOUND" ]; then
+        return 1
+    fi
+    # return 0 means found pattern
+    return 0
 }
 
 # save pf tables in case needed for backup
@@ -146,20 +156,20 @@ done
 
 # custom actions if new files are different
 if which pf-table >/dev/null 2>&1; then
-    diff -r $TMPOLDDIR $TMPNEWDIR | grep '/etc/pf.*\.table' >/dev/null 2>&1 \
+    compare_old_new '/etc/pf.*\.table' \
         && pf-table load all >/dev/null 2>&1
 fi
 
-diff -r $TMPOLDDIR $TMPNEWDIR | grep 'crontabbed' >/dev/null 2>&1 \
+compare_old_new 'crontabbed' \
     && users_crontabbed
 
-diff -r $TMPOLDDIR $TMPNEWDIR | grep '/etc/ssh.*sshd_config' >/dev/null 2>&1 \
+compare_old_new '/etc/ssh.*sshd_config' \
     && service sshd reload
 
-diff -r $TMPOLDDIR $TMPNEWDIR | grep '/etc/rc.conf.d.*mdnsd' >/dev/null 2>&1 \
+compare_old_new '/etc/rc.conf.d.*mdnsd' \
     && service mdnsd restart
 
-if diff -r $TMPOLDDIR $TMPNEWDIR | grep '/etc/rc.conf.d.*mdnsresponderposix' >/dev/null 2>&1 \
-    || diff -r $TMPOLDDIR $TMPNEWDIR | grep '/usr/local/etc.*mdnsresponder.conf' >/dev/null 2>&1 ; then
+if compare_old_new '/etc/rc.conf.d.*mdnsresponderposix' \
+    || compare_old_new '/usr/local/etc.*mdnsresponder.conf' ; then
     service mdnsresponderposix restart
 fi
