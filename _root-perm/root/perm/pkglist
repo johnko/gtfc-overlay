@@ -1,0 +1,98 @@
+beadm
+cmdwatch
+curl ca_root_nss
+git expat python27 libffi indexinfo gettext-runtime p5-Error perl5
+  cvsps p5-Authen-SASL p5-Digest-HMAC p5-GSSAPI curl ca_root_nss
+  p5-Net-SMTP-SSL p5-IO-Socket-SSL p5-Net-SSLeay p5-IO-Socket-IP
+  p5-Socket p5-Mozilla-CA
+gnupg1 indexinfo curl ca_root_nss gettext-runtime
+iftop
+iocage
+mDNSResponder_nss mDNSResponder
+nginx pcre
+openntpd
+openssl
+pkg
+pv
+rsync
+tmux libevent2
+ucarp
+w3m boehm-gc perl5
+wget indexinfo libidn gettext-runtime
+zsync
+
+########## delugefs-dev
+# py27-pybonjour mDNSResponder python27 libffi indexinfo
+#   gettext-runtime py27-setuptools27
+# py27-libtorrent-rasterbar libtorrent-rasterbar GeoIP boost-libs icu
+#   python27 libffi indexinfo gettext-runtime py27-setuptools27
+#   boost-python-libs
+# py27-sh python27 libffi indexinfo gettext-runtime py27-setuptools27
+# fusefs-libs
+
+########## libaacplus-build
+#   fftw3 fftw3-float indexinfo
+########## ffmpeg-build
+# libbluray libxml2 fontconfig expat freetype2 libbdplus libgpg-error
+#   indexinfo gettext-runtime libgcrypt libaacs
+# librtmp
+# gnutls nettle gmp ca_root_nss libtasn1 p11-kit libffi trousers-tddl
+#   libidn
+# opencv-core
+# libtheora libvorbis libogg
+# fftw3
+# fftw3-float
+# libvpx
+# libcdio-paranoia libcdio libcddb perl5
+# libass harfbuzz cairo libGL libXfixes xproto fixesproto libX11
+#   libXdmcp libxcb libpthread-stubs libXau kbproto dri2proto libXdamage
+#   damageproto libdevq libXxf86vm xf86vidmodeproto libXext xextproto
+#   libdrm libpciaccess pciids libxshmfence libglapi libXvMC libXv
+#   videoproto glproto libEGL gbm llvm36 python27 libedit libXrender
+#   renderproto png pixman xcb-util-renderutil xcb-util glib libiconv
+#   pcre icu graphite2 fribidi enca recode p5-Unicode-Map8
+#   p5-Unicode-String
+# libx264
+# schroedinger orc
+# xvid
+
+## minidlna
+#   fontconfig expat freetype2 libtheora libvorbis libogg
+#   xvid libvpx schroedinger orc gnutls nettle indexinfo gmp ca_root_nss
+#   libtasn1 gettext-runtime p11-kit libffi trousers-tddl libidn libx264
+#   opencv-core libexif sqlite3 jpeg-turbo flac libid3tag
+
+# firefly gcc indexinfo mpc gmp mpfr binutils gettext-runtime gcc-ecj
+#   vorbis-tools libao libvorbis libogg flac speex speexdsp libkate png
+#   curl ca_root_nss libid3tag sqlite3
+
+# youtube_dl rtmpdump librtmp python27 libffi indexinfo gettext-runtime
+
+# beets py27-musicbrainzngs python27 libffi indexinfo gettext-runtime
+#   py27-setuptools27 py27-enum34 py27-yaml py27-sqlite3 sqlite3
+#   py27-munkres py27-mutagen py27-unidecode
+# py27-pylast python27 libffi indexinfo gettext-runtime
+#   py27-setuptools27 py27-six
+# py27-pyechonest python27 libffi indexinfo gettext-runtime
+#   py27-setuptools27
+# py27-requests python27 libffi indexinfo gettext-runtime
+#   py27-setuptools27
+# py27-discogs-client python27 libffi indexinfo gettext-runtime
+#   py27-setuptools27 py27-requests py27-six py27-oauthlib py27-pycrypto
+#   gmp py27-blinker py27-pyjwt
+# py27-pyjwt python27 libffi indexinfo gettext-runtime
+#   py27-setuptools27
+
+########## ffmpeg
+#   fontconfig expat freetype2 libtheora libvorbis libogg xvid
+#   libvpx schroedinger orc gnutls nettle indexinfo gmp ca_root_nss
+#   libtasn1 gettext-runtime p11-kit libffi trousers-tddl libidn libx264
+#   opencv-core
+
+########## ezjail
+########## ori boost-libs icu fusefs-libs
+########## transmission-cli miniupnpc dht curl ca_root_nss libevent2
+##########   bittorrent-libutp libnatpmp
+########## radmind
+########## subversion serf apr expat gdbm indexinfo gettext-runtime db5 sqlite3
+########## yes '' | pkg install xfce | grep ': ' | grep -v 'Proceed' | awk -F: '{print $1}' | awk '{print $1}' | tr '\n' ' ' | fold -sw 70 | awk '{print "#   "$0}'
