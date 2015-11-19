@@ -105,8 +105,8 @@ if [ -d $ROLESDIR ]; then
 fi
 
 # backup of before for diff comparison
-rm -r $TMPOLDDIR
-rm -r $TMPNEWDIR
+[ -e $TMPOLDDIR ] && rm -r $TMPOLDDIR
+[ -e $TMPNEWDIR ] && rm -r $TMPNEWDIR
 backup_myconfig $TMPOLDDIR "_base-all $MYROLES $MYDOMAIN $MYHOST"
 
 # apply to tmp new for diff comparison
