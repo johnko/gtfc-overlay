@@ -127,12 +127,6 @@ if [ -e $PERMISSIONSFILE ]; then
     done
 fi
 
-# load pf tables in case changed
-which pf-table >/dev/null 2>&1 && pf-table load all >/dev/null 2>&1
-
-# crontabbed install for users
-users_crontabbed
-
 # create logs
 TOUCHFILES="
 /var/log/zfs-sync-xz-pull-all.log urep urep  644
@@ -149,3 +143,23 @@ echo "$TOUCHFILES" \
         ch_own_mod $path $user $group $octal
     fi
 done
+
+# custom actions if new files are different
+if which pf-table >/dev/null 2>&1; then
+    diff -r $TMPOLDDIR $TMPNEWDIR | grep '/etc/pf/.*\.table' >/dev/null 2>&1 \
+        && pf-table load all >/dev/null 2>&1
+fi
+
+diff -r $TMPOLDDIR $TMPNEWDIR | grep 'crontabbed' >/dev/null 2>&1 \
+    && users_crontabbed
+
+diff -r $TMPOLDDIR $TMPNEWDIR | grep '/etc/ssh/sshd_config' >/dev/null 2>&1 \
+    && service sshd reload
+
+diff -r $TMPOLDDIR $TMPNEWDIR | grep '/etc/rc.conf.d/mdnsd' >/dev/null 2>&1 \
+    && service mdnsd restart
+
+if diff -r $TMPOLDDIR $TMPNEWDIR | grep '/etc/rc.conf.d/mdnsresponderposix' >/dev/null 2>&1 \
+    || diff -r $TMPOLDDIR $TMPNEWDIR | grep '/usr/local/etc/mdnsresponder.conf' >/dev/null 2>&1 ; then
+    service mdnsresponderposix restart
+fi
