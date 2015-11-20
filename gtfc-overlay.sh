@@ -148,9 +148,9 @@ echo "$TOUCHFILES" \
     case "$path" in "#"*|"") continue; esac
     if [ ! -e $path ]; then
         touch $path
-    fi
-    if [ -e $path ]; then
-        ch_own_mod $path $user $group $octal
+        if [ -e $path ]; then
+            ch_own_mod $path $user $group $octal
+        fi
     fi
 done
 
