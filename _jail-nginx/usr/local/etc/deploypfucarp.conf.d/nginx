@@ -1,0 +1,3 @@
+# name public_ip public_port real_port ucarp=u_or_dot=off
+nginx   0   80  80  u
+nginx   0   443 443 .
