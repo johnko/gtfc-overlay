@@ -164,12 +164,12 @@ compare_old_new 'crontabbed' \
     && users_crontabbed
 
 compare_old_new '/etc/ssh.*sshd_config' \
-    && service sshd reload
+    && /etc/rc.d/sshd reload
 
 compare_old_new '/etc/rc.conf.d.*mdnsd' \
-    && service mdnsd restart
+    && /usr/local/etc/rc.d/mdnsd restart
 
 if compare_old_new '/etc/rc.conf.d.*mdnsresponderposix' \
     || compare_old_new '/usr/local/etc.*mdnsresponder.conf' ; then
-    service mdnsresponderposix restart
+    /usr/local/etc/rc.d/mdnsresponderposix restart
 fi
