@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. /usr/local/bin/loadmyvars.sh
+
+echo $IPNET
+echo $IOCPOOLNAME
+echo $IOCRELEASE
+echo $FQDN
+echo $SQUID
+echo $PERSONALMNT
+echo $SQUIDPKG
+echo $LAMEPKG
+echo $LIBAACPLUSPKG
+echo $FFMPEGPKG
+echo $GITLABPKG
+echo $COUCHBASEPKG
