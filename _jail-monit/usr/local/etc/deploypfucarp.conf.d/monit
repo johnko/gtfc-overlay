@@ -1,0 +1,2 @@
+# name public_ip public_port real_port ucarp=u_or_dot=off
+monit   0   2812    2812    u
