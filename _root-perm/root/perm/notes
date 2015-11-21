@@ -119,3 +119,27 @@ things_to_sync() {
     /root/local/
 EOF
 }
+
+# IP_net_suffix name boot=on_or_off
+
+setenv  JAILSGOOD '\
+6   dtfc                off \
+251 buildercouchbasepkg off \
+'
+
+setenv  JAILSDEV '\
+22  echoplexus  off \
+24  gitannex    off \
+9   gitlab      off \
+26  gogs        off \
+28  phabricator off \
+30  pydio       off \
+'
+
+setenv  JAILSBAD '\
+36  baikal    off \
+38  couchdtfc off \
+40  horde     off \
+'
+
+# minidlna and firefly have trouble getting multicast from jails

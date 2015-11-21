@@ -1,0 +1,2 @@
+env REPOSRC=https://virtual.local/git GITLABSRC=https://virtual.local/git \
+    _deploy_jails good
