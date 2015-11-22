@@ -161,13 +161,14 @@ fi
 
 compare_old_new 'crontabbed' && users_crontabbed
 
-compare_old_new '/etc/rc.conf.d.*iocage' && ioc-setup
+## iocage fetch doesn't work if called during git push
+#compare_old_new '/etc/rc.conf.d.*iocage' && ioc-setup
 
-# restarting or reloading services doesn't work if called during git push
-# compare_old_new '/etc/ssh.*sshd_config' && /etc/rc.d/sshd reload
-# compare_old_new '/etc/rc.conf.d.*mdnsd' && /usr/local/etc/rc.d/mdnsd restart
-if compare_old_new '/etc/rc.conf.d.*mdnsresponderposix' \
-    || compare_old_new '/usr/local/etc.*mdnsresponder.conf' ; then
-    # /usr/local/etc/rc.d/mdnsresponderposix restart
-    echo
-fi
+_deploy_jails
+
+## restarting or reloading services doesn't work if called during git push
+#compare_old_new '/etc/ssh.*sshd_config' && /etc/rc.d/sshd reload
+#compare_old_new '/etc/rc.conf.d.*mdnsd' && /usr/local/etc/rc.d/mdnsd restart
+#if compare_old_new '/etc/rc.conf.d.*mdnsresponderposix' || compare_old_new '/usr/local/etc.*mdnsresponder.conf' ; then
+#    /usr/local/etc/rc.d/mdnsresponderposix restart
+#fi
