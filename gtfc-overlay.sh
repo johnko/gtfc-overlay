@@ -171,3 +171,6 @@ compare_old_new 'crontabbed' && users_crontabbed
 #if compare_old_new '/etc/rc.conf.d.*mdnsresponderposix' || compare_old_new '/usr/local/etc.*mdnsresponder.conf' ; then
 #    /usr/local/etc/rc.d/mdnsresponderposix restart
 #fi
+
+## exit with success
+exit 0
