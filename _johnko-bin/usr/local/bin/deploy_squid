@@ -2,6 +2,8 @@
 
 # READY
 
+. /usr/local/bin/loadmyvars.sh
+
 if [ "x" == "x${SQUIDPKG}" ]; then
     echo "ERROR: SQUIDPKG not defined."
     exit 1

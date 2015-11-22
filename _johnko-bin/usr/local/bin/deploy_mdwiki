@@ -2,6 +2,8 @@
 
 # TODO
 
+. /usr/local/bin/loadmyvars.sh
+
 if [ "x" == "x${REPOSRC}" ]; then
     REPOSRC=https://github.com/johnko
 fi

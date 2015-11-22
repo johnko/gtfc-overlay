@@ -3,6 +3,8 @@
 # READY
 # Probably will not use because web calendar timezone is stuck on UTC
 
+. /usr/local/bin/loadmyvars.sh
+
 DB="horde"
 DBUSER="horde"
 DBPASS="password"

@@ -2,6 +2,8 @@
 
 # READY
 
+. /usr/local/bin/loadmyvars.sh
+
 DB="owncloud"
 DBUSER="owncloud"
 DBPASS="password"

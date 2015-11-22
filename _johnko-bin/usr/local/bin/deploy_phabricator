@@ -3,6 +3,8 @@
 # TODO: THIS IS A WORK IN PROGRESS
 # Probably will not use because too many extra features and requires its own domain
 
+. /usr/local/bin/loadmyvars.sh
+
 pkg install -y devel/phabricator
 
 echo

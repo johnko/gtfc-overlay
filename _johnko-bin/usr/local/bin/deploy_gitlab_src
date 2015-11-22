@@ -2,6 +2,8 @@
 
 # TODO, doens't allow psuh
 
+. /usr/local/bin/loadmyvars.sh
+
 if [ "x" == "x${GITLABSRC}" ]; then
     GITLABSRC=https://gitlab.com/
 fi

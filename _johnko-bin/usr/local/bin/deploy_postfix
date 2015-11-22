@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /usr/local/bin/loadmyvars.sh
+
 # to overwrite mailer.conf
 yes y | pkg install -fy postfix
 

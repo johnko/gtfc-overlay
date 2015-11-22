@@ -2,6 +2,8 @@
 
 # READY
 
+. /usr/local/bin/loadmyvars.sh
+
 # unattended build
 export BATCH=yes
 

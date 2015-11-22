@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# TODO
+# READY
 
 . /usr/local/bin/loadmyvars.sh
 
@@ -15,25 +15,26 @@ fi
 
 MYUSER="app"
 
-deploy_php_nginx
+deploy_nginx
 
 pkg install -y lang/go sudo
 
 echo "${MYUSER}:1004::::::/usr/home/${MYUSER}:/bin/sh:" | adduser -w no -f -
 
 cd /usr/home/${MYUSER}
-if [ ! -d /usr/home/${MYUSER}/src ]; then
-    sudo -u ${MYUSER} -i -- git clone --depth 1 ${REPOSRC}/h5ai.git /usr/home/${MYUSER}/src
+if [ ! -d /usr/home/${MYUSER}/src-uploadsh ]; then
+    sudo -u ${MYUSER} -i -- git clone --depth 1 ${REPOSRC}/upload.sh.git /usr/home/${MYUSER}/src-uploadsh
 fi
 
-cd /usr/home/${MYUSER}/src
-sh scripts/install.sh
+cd /usr/home/${MYUSER}/src-uploadsh
+sh extras/install.sh
 
 cat ~/git/deploy/usr/local/etc/nginx/sites-available/uploadsh \
 | sed "s/localhost.my.domain/${FQDN}/" \
 >/usr/local/etc/nginx/sites-enabled/uploadsh
 
+service uploadsh start
 service nginx restart
 
 echo
-echo "Visit https://${FQDN}/h5ai/"
+echo "Visit https://${FQDN}/upload/"

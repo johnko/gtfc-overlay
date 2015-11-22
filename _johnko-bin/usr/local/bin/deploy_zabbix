@@ -2,6 +2,8 @@
 
 # TODO
 
+. /usr/local/bin/loadmyvars.sh
+
 pkg install -y net-mgmt/zabbix24-frontend net-mgmt/zabbix24-server net-mgmt/zabbix24-agent
 
 echo

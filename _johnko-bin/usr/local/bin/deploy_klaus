@@ -2,6 +2,8 @@
 
 # Ready
 
+. /usr/local/bin/loadmyvars.sh
+
 if [ "x" == "x${FQDN}" ]; then
     echo "Please set or export variable FQDN"
     exit 1

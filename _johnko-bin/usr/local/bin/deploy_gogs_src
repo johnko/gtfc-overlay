@@ -5,6 +5,8 @@
 
 # Based on http://gogs.io/docs/installation/install_from_source.html
 
+. /usr/local/bin/loadmyvars.sh
+
 DB="gogs_production"
 DBUSER="git"
 DBPASS="password"

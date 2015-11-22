@@ -2,6 +2,8 @@
 
 # NOT READY, Installs but doesn't start
 
+. /usr/local/bin/loadmyvars.sh
+
 DB="gitlabhq_production"
 DBUSER="git"
 DBPASS="password"

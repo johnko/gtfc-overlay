@@ -156,8 +156,8 @@ echo "$JAILNAMES" \
                     setupnginxconfig ${name} ${FQDN}
                     ;;
                 easydnsclient)              env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
-                couch|couchdb)              env IP=${IPNET}${num}  _deploy_app ${name} ${boot} couchdb ;;
-                dtfc|uploadsh|transfersh)   env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                couchdb)                    env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                dtfc|upload|transfer)       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                 mdwiki)                     env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                 piwik)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                 ejabberd)                   env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
@@ -201,7 +201,6 @@ echo "$JAILNAMES" \
                 pydio)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                 # BAD JAILNAMES
                 baikal)                     env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
-                couchdtfc|couchdbdtfc)      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} couchdbdtfc ;;
                 horde)
                     allowsysvipc ${name}
                                             env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}webmail
