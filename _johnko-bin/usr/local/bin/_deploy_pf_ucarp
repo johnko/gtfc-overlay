@@ -36,34 +36,36 @@ setuppf() {
     nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any -> ${HOSTIP}
 EOF
 
-    echo "$JAILSIPFWD" \
-    | while read name ipalias pubport realport doucarp ; do
-        #echo "debug ${name} ${ipalias} ${pubport} ${realport}"
-        if [ "x0" != "x${ipalias}" ] && [ "x" != "x${ipalias}" ] \
-        && [ "x" != "x${name}" ] && [ "x" != "x${pubport}" ] \
-        && [ "x" != "x${realport}" ] && [ "x" != "x${doucarp}" ] \
-        && [ "x" != "x`jailip ${name}`" ]; then
-            if  ! pf-anchor show jails | grep "rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${HOSTIP} port = ${pubport} " >/dev/null ; then
-                cat >>/etc/pf/jails.anchor <<EOF
+    if ls /usr/local/etc/deploypfucarp.conf.d/* >/dev/null 2>&1 ; then
+        cat /usr/local/etc/deploypfucarp.conf.d/* \
+        | while read name ipalias pubport realport doucarp ; do
+            case "$name" in "#"*|"") continue; esac
+            #echo "debug ${name} ${ipalias} ${pubport} ${realport}"
+            if [ "x0" != "x${ipalias}" ] && [ "x" != "x${ipalias}" ] \
+            && [ "x" != "x${name}" ] && [ "x" != "x${pubport}" ] \
+            && [ "x" != "x${realport}" ] && [ "x" != "x${doucarp}" ] \
+            && [ "x" != "x`jailip ${name}`" ]; then
+                if  ! pf-anchor show jails | grep "rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${HOSTIP} port = ${pubport} " >/dev/null ; then
+                    cat >>/etc/pf/jails.anchor <<EOF
 rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${HOSTIP} port = ${pubport} -> ${IPNET}`jailip ${name}` port ${realport}
 EOF
-            fi
-            if  ! pf-anchor show jails | grep "rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${ipalias} port = ${pubport} " >/dev/null ; then
-                cat >>/etc/pf/jails.anchor <<EOF
+                fi
+                if  ! pf-anchor show jails | grep "rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${ipalias} port = ${pubport} " >/dev/null ; then
+                    cat >>/etc/pf/jails.anchor <<EOF
 rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${ipalias} port = ${pubport} -> ${IPNET}`jailip ${name}` port ${realport}
 EOF
-            fi
-            if [ "xu" == "x${doucarp}" ]; then
-                if [ ! -e /usr/local/etc/rc.d/ucarp${name} ]; then
-                    cat /usr/local/etc/rc.d/ucarp \
-                    | sed "s;ucarp;ucarp${name};g" >/usr/local/etc/rc.d/ucarp${name}
-                    chmod 755 /usr/local/etc/rc.d/ucarp${name}
                 fi
-                if [ ! -e /usr/local/sbin/ucarp${name} ]; then
-                    ln /usr/local/sbin/ucarp /usr/local/sbin/ucarp${name}
-                fi
-                if [ ! -e /etc/rc.conf.d/ucarp${name} ]; then
-                    cat >/etc/rc.conf.d/ucarp${name}.tmp <<EOF
+                if [ "xu" == "x${doucarp}" ]; then
+                    if [ ! -e /usr/local/etc/rc.d/ucarp${name} ]; then
+                        cat /usr/local/etc/rc.d/ucarp \
+                        | sed "s;ucarp;ucarp${name};g" >/usr/local/etc/rc.d/ucarp${name}
+                        chmod 755 /usr/local/etc/rc.d/ucarp${name}
+                    fi
+                    if [ ! -e /usr/local/sbin/ucarp${name} ]; then
+                        ln /usr/local/sbin/ucarp /usr/local/sbin/ucarp${name}
+                    fi
+                    if [ ! -e /etc/rc.conf.d/ucarp${name} ]; then
+                        cat >/etc/rc.conf.d/ucarp${name}.tmp <<EOF
 ucarp_enable="YES"
 ucarp_addr="${ipalias}"
 ucarp_if="${HOSTNIC}"
@@ -76,16 +78,17 @@ ucarp_pass="${name}"
 # primary   ucarp_advskew="100"
 # secondary ucarp_advskew="200"
 EOF
-                    sed "s/ucarp_/ucarp${name}_/g" /etc/rc.conf.d/ucarp${name}.tmp >/etc/rc.conf.d/ucarp${name}
-                    rm /etc/rc.conf.d/ucarp${name}.tmp
+                        sed "s/ucarp_/ucarp${name}_/g" /etc/rc.conf.d/ucarp${name}.tmp >/etc/rc.conf.d/ucarp${name}
+                        rm /etc/rc.conf.d/ucarp${name}.tmp
+                    fi
+                    ## start ucarp* but only if enabled
+                    ## because it could have been disabled on purpose
+                    service ucarp${name} onestatus >/dev/null 2>/dev/null || service ucarp${name} start
                 fi
-                ## start ucarp* but only if enabled
-                ## because it could have been disabled on purpose
-                service ucarp${name} onestatus >/dev/null 2>/dev/null || service ucarp${name} start
             fi
-        fi
-        #echo "debug after if name ${name}"
-    done
+            #echo "debug after if name ${name}"
+        done
+    fi
     pf-anchor clear jails
     pf-anchor load jails
 }
@@ -93,9 +96,10 @@ EOF
 jailip() {
     local name
     local num
-    JAILDATASET="${JAILSGOOD} ${JAILSDEV} ${JAILSBAD}"
-    echo "$JAILDATASET" \
+    if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
+        cat /usr/local/etc/deployjails.conf.d/* \
         | while read num name ; do
+            case "$num" in "#"*|"") continue; esac
             if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
                 #echo "debug: search ${1}, name ${name}"
                 if [ "x${1}" == "x${name}" ]; then
@@ -105,6 +109,7 @@ jailip() {
                 fi
             fi
         done
+    fi
 }
 
 setuppf

@@ -7,14 +7,16 @@ if sysctl security.jail.jailed | grep 1 >/dev/null 2>&1; then
     exit 1
 fi
 
-JAILNAMES="${JAILSGOOD} ${JAILSBAD} ${JAILSDEV}"
 
-echo "$JAILNAMES" \
-| while read num name ; do
-    if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
-        if [ "xsquid" != "x${name}" ]; then
-            iocage stop ${name}
-            iocage destroy -f ${name}
+if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
+    cat /usr/local/etc/deployjails.conf.d/* \
+    | while read num name ; do
+        case "$num" in "#"*|"") continue; esac
+        if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
+            if [ "xsquid" != "x${name}" ]; then
+                iocage stop ${name}
+                iocage destroy -f ${name}
+            fi
         fi
-    fi
-done
+    done
+fi
