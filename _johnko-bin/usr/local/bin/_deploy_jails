@@ -94,10 +94,6 @@ case ${1} in
         setupnginxconfig nginx ${FQDN}
         exit
         ;;
-    *)
-        echo "ERROR: $0 [good|bad|dev|nginx]"
-        exit 1
-        ;;
 esac
 
 allowsysvipc() {
