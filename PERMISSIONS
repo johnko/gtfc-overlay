@@ -74,6 +74,7 @@
 /root/perm/pkgpath.lame.conf                              root      wheel     600
 /root/perm/pkgpath.libaacplus.conf                        root      wheel     600
 /root/perm/pkgpath.squid.conf                             root      wheel     600
+/root/perm/reposrc.conf                                   root      wheel     600
 /root/perm/squid.conf                                     root      wheel     600
 /root/perm/tmux.conf.prettyline                           root      wheel     600
 /root/perm/tmux.conf.simpleline                           root      wheel     600
