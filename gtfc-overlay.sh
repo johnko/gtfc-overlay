@@ -163,8 +163,7 @@ compare_old_new 'crontabbed' && users_crontabbed
 
 ## iocage fetch doesn't work if called during git push
 #compare_old_new '/etc/rc.conf.d.*iocage' && ioc-setup
-
-_deploy_jails
+#compare_old_new '/etc/rc.conf.d.*iocage' && _deploy_jails
 
 ## restarting or reloading services doesn't work if called during git push
 #compare_old_new '/etc/ssh.*sshd_config' && /etc/rc.d/sshd reload

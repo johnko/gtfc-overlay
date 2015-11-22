@@ -28,3 +28,5 @@ for i in \
         . ${LOCALDIR}/$i
     fi
 done
+
+HTTP_PROXY=http://${SQUID}
