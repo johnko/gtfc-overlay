@@ -134,7 +134,6 @@
 /usr/local/bin/delugefs-shell                             root      wheel     755
 /usr/local/bin/delugefs_prep_existing_node                root      wheel     755
 /usr/local/bin/delugefs_prep_new_node                     root      wheel     755
-/usr/local/bin/deploy                                     root      wheel     755
 /usr/local/bin/deploy_apache24                            root      wheel     755
 /usr/local/bin/deploy_baikal                              root      wheel     755
 /usr/local/bin/deploy_beets                               root      wheel     755
