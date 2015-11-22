@@ -34,8 +34,6 @@ deployapp=$3
 if [ "x" = "x${deployapp}" ]; then
     deployapp=${name}
 fi
-sysrc -f $( ioc-pathof ${name} )/etc/rc.conf.d/firstboot_jail firstboot_jail_fqdn=${FQDN}
-sysrc -f $( ioc-pathof ${name} )/etc/rc.conf.d/firstboot_jail firstboot_jail_reposrc=${REPOSRC}
 sysrc -f $( ioc-pathof ${name} )/etc/rc.conf.d/firstboot_jail firstboot_jail_deploy=${deployapp}
 iocage start ${name}
 iocage set boot=${boot} ${name}

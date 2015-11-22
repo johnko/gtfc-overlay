@@ -18,6 +18,7 @@ for i in \
     pkgpath.lame.conf \
     pkgpath.libaacplus.conf \
     pkgpath.squid.conf \
+    reposrc.conf \
     squid.conf \
     ; do
     if [ -e ${DEFAULTDIR}/$i ]; then

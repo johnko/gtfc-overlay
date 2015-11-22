@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /usr/local/bin/loadmyvars.sh
+
 if [ "x" = "x$PERSONALMNT" ]; then
     PERSONALMNT=/vault/data
 fi

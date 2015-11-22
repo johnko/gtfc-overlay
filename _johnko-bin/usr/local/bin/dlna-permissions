@@ -2,6 +2,8 @@
 
 # full path to bins because called from cron
 
+. /usr/local/bin/loadmyvars.sh
+
 if [ "x" = "x$PERSONALMNT" ]; then
     PERSONALMNT=/vault/data
 fi
