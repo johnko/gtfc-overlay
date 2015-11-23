@@ -50,7 +50,7 @@ build_it_now() {
 
 PORTNAME="audio/lame"
 ## install dependencies
-pkg install -y devel/gmake converters/libiconv
+pkg install -y devel/gmake #converters/libiconv
 build_it_now ${PORTNAME}
 
 
@@ -70,8 +70,8 @@ pkg install -y devel/yasm devel/binutils graphics/frei0r devel/gmake \
     multimedia/librtmp \
     x11-fonts/fontconfig print/freetype2 graphics/opencv-core \
     multimedia/schroedinger multimedia/libtheora audio/libvorbis \
-    multimedia/libvpx multimedia/libx264 multimedia/xvid security/gnutls \
-    converters/libiconv
+    multimedia/libvpx multimedia/libx264 multimedia/xvid security/gnutls
+    #converters/libiconv
 ## we want custom options
 if [ ! -e /usr/ports/${PORTNAME}/Makefile.orig ]; then
     cp /usr/ports/${PORTNAME}/Makefile /usr/ports/${PORTNAME}/Makefile.orig
