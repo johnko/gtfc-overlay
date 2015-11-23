@@ -81,6 +81,12 @@ if [ "x" = "x${deployapp}" ]; then
 fi
 sysrc -f $( ioc-pathof ${name} )/etc/rc.conf.d/firstboot_jail firstboot_jail_deploy=${deployapp}
 
+### install some deploy_* scripts for firstboot
+install -d -m 755 -o root -g wheel $( ioc-pathof ${name} )/usr/local/bin
+for i in $( ls /usr/local/bin/deploy_* ) ; do
+    install -C -m 755 $i $( ioc-pathof ${name} )/usr/local/bin/
+done
+
 # PRESTART COPY
 case ${name} in
     squid|gitlab|builder|buildersquidpkg|builderffmpegpkg|buildgitlabpkg)
