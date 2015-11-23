@@ -58,27 +58,6 @@ if [ "x" = "x${count}" ]; then
     count=0
 fi
 
-
-
-jailip() {
-    local name
-    local num
-    if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
-        cat /usr/local/etc/deployjails.conf.d/* \
-        | while read num name ; do
-            case "$num" in "#"*|"") continue; esac
-            if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
-                #echo "debug: search ${1}, name ${name}"
-                if [ "x${1}" = "x${name}" ]; then
-                    RESULT=$(( count + num ))
-                    #echo "debug: match ${num}, result ${RESULT}"
-                    echo "${RESULT}"
-                fi
-            fi
-        done
-    fi
-}
-
 setupnginxconfig() {
     local name=${1}
     local FQDN=${2}
@@ -100,32 +79,6 @@ allowsysvipc() {
     iocage set allow_sysvipc=1 ${1}
 }
 
-copysslselfcert() {
-    if [ "x" != "x${HTTP_PROXY}" ]; then
-        PROXYIP=$( echo $HTTP_PROXY | awk -F/ '{print $NF}' | awk -F: '{print $1}' )
-        if [ "x10.7.7.1" = "$PROXYIP" ]; then
-            cat $( ioc-pathof squid )/usr/local/etc/squid/public.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
-        else
-            curl --output $( ioc-pathof ${1} )/root/public-${PROXYIP}.pem http://${PROXYIP}:3127/public.pem
-            cat           $( ioc-pathof ${1} )/root/public-${PROXYIP}.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
-        fi
-    else
-        cat $( ioc-pathof squid )/usr/local/etc/squid/public.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
-    fi
-}
-
-copy_var_ports() {
-    name=$1
-    if [ -e /var/ports ]; then
-        rsync -qalmP --exclude work /var/ports/ $( ioc-pathof ${name} )/var/ports/
-    fi
-}
-
-save_var_ports() {
-    name=$1
-    rsync -qalmP --exclude work $( ioc-pathof ${name} )/var/ports/ /var/ports/
-}
-
 env IPNET="${IPNET}" HOSTIP="${HOSTIP}" HOSTNIC="${HOSTNIC}" _deploy_pf_ucarp
 
 
@@ -138,15 +91,11 @@ if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
                 # The following case can be in any order
                 case ${name} in
                     # GOOD JAILNAMES
-                    squid)
-                        copy_var_ports ${name}
-                                                env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
-                        save_var_ports ${name}
-                        ;;
                     nginx)
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
                         setupnginxconfig ${name} ${FQDN}
                         ;;
+                    squid)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                     easydnsclient)              env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                     couchdb)                    env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                     dtfc|upload|transfer)       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
@@ -159,29 +108,15 @@ if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
                     smtp)                       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} postfix ;;
                     imap)                       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} dovecot ;;
                     owncloud)
-                        if [         -d /root/local/owncloud ]; then
-                            mkdir -p                          $( ioc-pathof ${name} )/root/local/owncloud
-                            rsync -qalmP /root/local/owncloud/ $( ioc-pathof ${name} )/root/local/owncloud/
-                        fi
                         allowsysvipc ${name}
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
-                        rsync -qalmP $( ioc-pathof ${name} )/root/local/owncloud/ /root/local/owncloud/
                         ;;
                     gitlab)
-                        copy_var_ports ${name}
                         allowsysvipc ${name}
-                        ## only if we are installing via src to cache rubygems
-                        #copysslselfcert ${name}
-                        # Set jail ip as FQDN so git-shell works
-                        grep -v " ${FQDN}" $( ioc-pathof ${name} )/etc/hosts >$( ioc-pathof ${name} )/etc/hosts.tmp
-                        cat $( ioc-pathof ${name} )/etc/hosts.tmp >$( ioc-pathof ${name} )/etc/hosts
-                        echo "${IPNET}`jailip gitlab` ${FQDN}" >>$( ioc-pathof ${name} )/etc/hosts
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}_config
                         ;;
                     builder|buildersquidpkg|builderffmpegpkg|buildgitlabpkg)
-                        copy_var_ports ${name}
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
-                        save_var_ports ${name}
                         ;;
                     # DEV JAILNAMES
                     monit)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
@@ -198,9 +133,9 @@ if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}webmail
                         ;;
                 esac
-                if [ "xsquid" != "x${name}" ]; then
-                    iocage stop ${name}
-                fi
+                #if [ "xsquid" != "x${name}" ]; then
+                #    iocage stop ${name}
+                #fi
             fi # end of if not jail exists
         fi # end of if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
     done

@@ -1,5 +1,50 @@
 #!/bin/sh
 
+jailip() {
+    local name
+    local num
+    if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
+        cat /usr/local/etc/deployjails.conf.d/* \
+        | while read num name ; do
+            case "$num" in "#"*|"") continue; esac
+            if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
+                #echo "debug: search ${1}, name ${name}"
+                if [ "x${1}" = "x${name}" ]; then
+                    RESULT=$(( count + num ))
+                    #echo "debug: match ${num}, result ${RESULT}"
+                    echo "${RESULT}"
+                fi
+            fi
+        done
+    fi
+}
+
+copy_var_ports() {
+    local name=$1
+    if [ -e /var/ports ]; then
+        rsync -qalmP --exclude work /var/ports/ $( ioc-pathof ${name} )/var/ports/
+    fi
+}
+
+save_var_ports() {
+    local name=$1
+    rsync -qalmP --exclude work $( ioc-pathof ${name} )/var/ports/ /var/ports/
+}
+
+copysslselfcert() {
+    if [ "x" != "x${HTTP_PROXY}" ]; then
+        PROXYIP=$( echo $HTTP_PROXY | awk -F/ '{print $NF}' | awk -F: '{print $1}' )
+        if [ "x10.7.7.1" = "$PROXYIP" ]; then
+            cat $( ioc-pathof squid )/usr/local/etc/squid/public.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
+        else
+            curl --output $( ioc-pathof ${1} )/root/public-${PROXYIP}.pem http://${PROXYIP}:3127/public.pem
+            cat           $( ioc-pathof ${1} )/root/public-${PROXYIP}.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
+        fi
+    else
+        cat $( ioc-pathof squid )/usr/local/etc/squid/public.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
+    fi
+}
+
 if [ "x" = "x${NIC}" ]; then
     NIC="lo1"
     if ! ifconfig ${NIC} >/dev/null ; then
@@ -35,5 +80,37 @@ if [ "x" = "x${deployapp}" ]; then
     deployapp=${name}
 fi
 sysrc -f $( ioc-pathof ${name} )/etc/rc.conf.d/firstboot_jail firstboot_jail_deploy=${deployapp}
+
+# PRESTART COPY
+case ${name} in
+    squid|gitlab|builder|buildersquidpkg|builderffmpegpkg|buildgitlabpkg)
+        copy_var_ports ${name}
+    ;;
+    owncloud)
+        if [         -d /root/local/owncloud ]; then
+            mkdir -p                          $( ioc-pathof ${name} )/root/local/owncloud
+            rsync -qalmP /root/local/owncloud/ $( ioc-pathof ${name} )/root/local/owncloud/
+        fi
+    ;;
+    gitlab)
+        ## only if we are installing via src to cache rubygems
+        #copysslselfcert ${name}
+        # Set jail ip as FQDN so git-shell works
+        grep -v " ${FQDN}" $( ioc-pathof ${name} )/etc/hosts >$( ioc-pathof ${name} )/etc/hosts.tmp
+        cat $( ioc-pathof ${name} )/etc/hosts.tmp >$( ioc-pathof ${name} )/etc/hosts
+        echo "${IPNET}`jailip gitlab` ${FQDN}" >>$( ioc-pathof ${name} )/etc/hosts
+    ;;
+esac
+
 iocage start ${name}
 iocage set boot=${boot} ${name}
+
+# AFTER START COPY
+case ${name} in
+    squid|gitlab|builder|buildersquidpkg|builderffmpegpkg|buildgitlabpkg)
+        save_var_ports ${name}
+    ;;
+    owncloud)
+        rsync -qalmP $( ioc-pathof ${name} )/root/local/owncloud/ /root/local/owncloud/
+    ;;
+esac
