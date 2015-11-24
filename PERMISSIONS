@@ -153,6 +153,7 @@
 /usr/local/bin/deploy_gitlab_config                       root      wheel     755
 /usr/local/bin/deploy_gitlab_deps                         root      wheel     755
 /usr/local/bin/deploy_gitlab_runtimedeps                  root      wheel     755
+/usr/local/bin/deploy_gitlab-setup                        root      wheel     755
 /usr/local/bin/deploy_gitlab_src                          root      wheel     755
 /usr/local/bin/deploy_gogs_src                            root      wheel     755
 /usr/local/bin/deploy_h5ai                                root      wheel     755
