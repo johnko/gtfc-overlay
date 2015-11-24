@@ -38,7 +38,7 @@ build_it_now() {
 
 
 ## install dependencies
-deploy_gitlab_runtimedeps
+#deploy_gitlab_runtimedeps
 
 # Build dependencies
 #deploy_gitlab_builddeps
