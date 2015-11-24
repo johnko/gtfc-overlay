@@ -115,7 +115,7 @@ if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
                         allowsysvipc ${name}
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}_config
                         ;;
-                    builder|buildersquidpkg|builderffmpegpkg|buildgitlabpkg)
+                    builder|buildersquidpkg|builderffmpegpkg|buildergitlabpkg)
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
                         ;;
                     # DEV JAILNAMES
