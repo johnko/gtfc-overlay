@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# READY
+
+# Build dependencies for 8.1
+pkg install -y \
+bash \
+cmake \
+lang/go \
+sudo \
+icu \
+ruby \
+ruby21-gems \
+node \
+popt \
+redis \
+postgresql94-server \
+postfix
