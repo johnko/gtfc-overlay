@@ -15,4 +15,8 @@ node \
 popt \
 redis \
 postgresql94-server \
-postfix
+postfix \
+gettext-tools \
+gmake \
+pkgconf \
+logrotate
