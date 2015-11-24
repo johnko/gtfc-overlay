@@ -230,6 +230,7 @@
 /usr/local/bin/ioc-newtemplate                            root      wheel     755
 /usr/local/bin/ioc-pathof                                 root      wheel     755
 /usr/local/bin/ioc-setup                                  root      wheel     755
+/usr/local/bin/jailip                                     root      wheel     755
 /usr/local/bin/loadmyvars.sh                              root      wheel     755
 /usr/local/bin/mfsbsd-pre-fzg                             root      wheel     755
 /usr/local/bin/mount_iso                                  root      wheel     755
