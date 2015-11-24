@@ -44,7 +44,8 @@ fi
 
 echo 1.a Dependencies
 
-deploy_gitlab_runtimedeps
+#deploy_gitlab_runtimedeps
+deploy_gitlab_deps
 
 # for this script
 pkg install -y sudo
@@ -61,7 +62,7 @@ fi
 
 
 echo 2 postgresql
-deploy_postgresql93 1100 ${DB} ${DBUSER} ${DBPASS}
+deploy_postgresql94 1100 ${DB} ${DBUSER} ${DBPASS}
 
 
 echo 3 redis
@@ -78,57 +79,54 @@ echo 4 gitlab
 #cd /usr/local/www/gitlab
 # Update GitLab config file, follow the directions at top of file
 #The option host: should be set to your domain, e.g. "gitlab.mysite.com".
-if sysctl security.jail.jailed | grep 1 >/dev/null ; then
-    cat /usr/local/www/gitlab/config/gitlab.yml.sample \
-    | sed 's/# ssh_port: 22/ssh_port: 23/' \
-    | sed "s/host: localhost/host: ${FQDN}/" \
-    | sed 's/port: 80/port: 443/' \
-    | sed 's/https: false/https: true/' \
-    >/usr/local/www/gitlab/config/gitlab.yml
+#if sysctl security.jail.jailed | grep 1 >/dev/null ; then
+#    cat /usr/local/www/gitlab/config/gitlab.yml.sample \
+#    | sed 's/# ssh_port: 22/ssh_port: 23/' \
+#    | sed 's/port: 80/port: 443/' \
+#    | sed 's/https: false/https: true/' \
+#    >/usr/local/www/gitlab/config/gitlab.yml
+#    | sed "s/host: localhost/host: ${FQDN}/" \
 #    | sed 's/# email_enabled: true/email_enabled: false/' \
-else
-    cat /usr/home/git/gitlab/config/gitlab.yml.sample \
-    | sed "s/host: localhost/host: ${FQDN}/" \
-    | sed 's/port: 80/port: 443/' \
-    | sed 's/https: false/https: true/' \
-    >/usr/local/www/gitlab/config/gitlab.yml
+#else
+#    cat /usr/home/git/gitlab/config/gitlab.yml.sample \
+#    | sed 's/port: 80/port: 443/' \
+#    | sed 's/https: false/https: true/' \
+#    >/usr/local/www/gitlab/config/gitlab.yml
+#    | sed "s/host: localhost/host: ${FQDN}/" \
 #    | sed 's/# email_enabled: true/email_enabled: false/' \
-fi
+#fi
 # Find number of cores
 #sysctl hw.ncpu
 # Enable cluster mode if you expect to have a high load instance
 # Ex. change amount of workers to 3 for 2GB RAM server
 # Set the number of workers to at least the number of cores
-cat /usr/local/www/gitlab/config/unicorn.rb.sample \
-| sed 's/worker_processes 3/worker_processes 1/' \
->/usr/local/www/gitlab/config/unicorn.rb
+#cat /usr/local/www/gitlab/config/unicorn.rb.sample \
+#| sed 's/worker_processes 3/worker_processes 1/' \
+#>/usr/local/www/gitlab/config/unicorn.rb
 # Configure Git global settings for git user, used when editing via web editor
-sudo -u git -H git config --global core.autocrlf "input"
+#sudo -u git -H git config --global core.autocrlf "input"
 # Change the Redis socket path if you are not using the default Debian / Ubuntu configuration
 # Configure Redis to use the modified socket path
 # Change 'production' line to 'unix:/usr/local/var/run/redis/redis.sock'
-cat /usr/local/www/gitlab/config/resque.yml.sample \
->/usr/local/www/gitlab/config/resque.yml
+#cat /usr/local/www/gitlab/config/resque.yml.sample \
+#>/usr/local/www/gitlab/config/resque.yml
 # Change 'secure password' with the value you have given to $password
 # You can keep the double quotes around the password
-cat /usr/local/www/gitlab/config/database.yml.postgresql \
->/usr/local/www/gitlab/config/database.yml
+#cat /usr/local/www/gitlab/config/database.yml.postgresql \
+#>/usr/local/www/gitlab/config/database.yml
 # Install gitlab-shell
-sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:shell:install[v2.6.3] REDIS_URL=unix:/var/run/redis/redis.sock RAILS_ENV=production
+#sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:shell:install[v2.6.3] REDIS_URL=unix:/var/run/redis/redis.sock RAILS_ENV=production
 
 
 echo 8 Initialise Database
 
-yes yes | sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:setup RAILS_ENV=production GITLAB_ROOT_PASSWORD=${ROOTPASS}
+#yes yes | sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:setup RAILS_ENV=production GITLAB_ROOT_PASSWORD=${ROOTPASS}
 # Check Application Status
-sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:env:info RAILS_ENV=production
+#sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:env:info RAILS_ENV=production
 # Compile Assets
-sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake assets:precompile RAILS_ENV=production
-# Enable services
-sysrc gitlab_enable="YES"
-# Start Your GitLab Instance
-service gitlab start
+#sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake assets:precompile RAILS_ENV=production
 
+deploy_gitlab-setup
 
 if sysctl security.jail.jailed | grep 0 >/dev/null ; then
     echo Other services: openntpd
@@ -166,7 +164,6 @@ Visit http://${JAILIP}/
 Login as root:${ROOTPASS}
 Repos to clone:
     https://github.com/johnko/*
-    https://github.com/johnko/dtfc.git
     https://github.com/qq99/echoplexus.git
     https://gitlab.com/gitlab-org/gitlab-ce.git
 EOF
