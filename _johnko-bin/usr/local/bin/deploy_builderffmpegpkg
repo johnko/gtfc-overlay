@@ -4,6 +4,8 @@
 
 . /usr/local/bin/loadmyvars.sh
 
+psnap
+
 # unattended build
 export BATCH=yes
 
@@ -32,8 +34,6 @@ fi
 
 
 build_it_now() {
-    ## don't run portsnap
-    # psnap
     mkdir -p /var/ports/packages/All
     echo "building ${1}"
     safename=$( echo "${1}" | tr / _ )

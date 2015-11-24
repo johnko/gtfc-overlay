@@ -4,6 +4,8 @@
 
 . /usr/local/bin/loadmyvars.sh
 
+psnap
+
 # unattended build
 export BATCH=yes
 
@@ -20,8 +22,6 @@ rsync -virthP --exclude .git  ${HOME}/gitlabports/  /usr/ports/
 
 
 build_it_now() {
-    ## don't run portsnap
-    # psnap
     mkdir -p /var/ports/packages/All
     echo "building ${1}"
     safename=$( echo "${1}" | tr / _ )
