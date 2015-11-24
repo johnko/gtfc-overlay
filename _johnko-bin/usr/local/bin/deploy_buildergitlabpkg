@@ -14,7 +14,7 @@ fi
 
 
 if [ ! -d ${HOME}/gitlabports ]; then
-    git clone --depth 1 ${REPOSRC}/freebsd-ports-test.git -b gitlab-7.14.1 ${HOME}/gitlabports
+    git clone --depth 1 ${REPOSRC}/freebsd-ports-test.git -b gitlab-7.14.3 ${HOME}/gitlabports
 fi
 rsync -virthP --exclude .git  ${HOME}/gitlabports/  /usr/ports/
 
