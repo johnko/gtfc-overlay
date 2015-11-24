@@ -93,23 +93,4 @@ EOF
     pf-anchor load jails
 }
 
-jailip() {
-    local name
-    local num
-    if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
-        cat /usr/local/etc/deployjails.conf.d/* \
-        | while read num name ; do
-            case "$num" in "#"*|"") continue; esac
-            if [ "x" != "x${num}" ] && [ "x" != "x${name}" ]; then
-                #echo "debug: search ${1}, name ${name}"
-                if [ "x${1}" == "x${name}" ]; then
-                    RESULT=$(( count + num ))
-                    #echo "debug: match ${num}, result ${RESULT}"
-                    echo "${RESULT}"
-                fi
-            fi
-        done
-    fi
-}
-
 setuppf
