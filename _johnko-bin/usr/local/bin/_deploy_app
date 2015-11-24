@@ -1,5 +1,9 @@
 #!/bin/sh
 
+allowsysvipc() {
+    iocage set allow_sysvipc=1 ${1}
+}
+
 jailip() {
     local name
     local num
@@ -97,6 +101,7 @@ case ${name} in
             mkdir -p                          $( ioc-pathof ${name} )/root/local/owncloud
             rsync -qalmP /root/local/owncloud/ $( ioc-pathof ${name} )/root/local/owncloud/
         fi
+        allowsysvipc ${name}
     ;;
     gitlab)
         ## only if we are installing via src to cache rubygems
@@ -105,6 +110,10 @@ case ${name} in
         grep -v " ${FQDN}" $( ioc-pathof ${name} )/etc/hosts >$( ioc-pathof ${name} )/etc/hosts.tmp
         cat $( ioc-pathof ${name} )/etc/hosts.tmp >$( ioc-pathof ${name} )/etc/hosts
         echo "${IPNET}`jailip gitlab` ${FQDN}" >>$( ioc-pathof ${name} )/etc/hosts
+        allowsysvipc ${name}
+    ;;
+    horde)
+        allowsysvipc ${name}
     ;;
 esac
 

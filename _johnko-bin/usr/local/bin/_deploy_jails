@@ -75,10 +75,6 @@ case ${1} in
         ;;
 esac
 
-allowsysvipc() {
-    iocage set allow_sysvipc=1 ${1}
-}
-
 env IPNET="${IPNET}" HOSTIP="${HOSTIP}" HOSTNIC="${HOSTNIC}" _deploy_pf_ucarp
 
 
@@ -107,14 +103,8 @@ if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
                     klaus)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                     smtp)                       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} postfix ;;
                     imap)                       env IP=${IPNET}${num}  _deploy_app ${name} ${boot} dovecot ;;
-                    owncloud)
-                        allowsysvipc ${name}
-                                                env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
-                        ;;
-                    gitlab)
-                        allowsysvipc ${name}
-                                                env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}_config
-                        ;;
+                    owncloud)                   env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
+                    gitlab)                     env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}_config ;;
                     builder|buildersquidpkg|builderffmpegpkg|buildergitlabpkg)
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
                         ;;
@@ -128,10 +118,7 @@ if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
                     pydio)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                     # BAD JAILNAMES
                     baikal)                     env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
-                    horde)
-                        allowsysvipc ${name}
-                                                env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}webmail
-                        ;;
+                    horde)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ${name}webmail ;;
                 esac
                 #if [ "xsquid" != "x${name}" ]; then
                 #    iocage stop ${name}
