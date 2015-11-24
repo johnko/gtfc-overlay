@@ -1,8 +1,8 @@
 #!/bin/sh
 
-allowsysvipc() {
-    iocage set allow_sysvipc=1 ${1}
-}
+name=$1
+boot=$2
+deployapp=$3
 
 jailip() {
     local name
@@ -64,7 +64,6 @@ if ! iocage list -r | grep 'RELEASE' >/dev/null 2>/dev/null ; then
     fi
 fi
 
-name=$1
 if ! iocage get tag ${name} >/dev/null 2>/dev/null; then
     # typically only in here if deploying a single app not with _deploy_jails, eg.
     # env NIC=lo1 IP=10.7.7.7
@@ -75,11 +74,9 @@ if ! iocage get tag ${name} >/dev/null 2>/dev/null; then
     echo "Creating: ${name} on ${NIC} w/ IP ${IP}"
     ioc-newjail ${name} "${NIC}|${IP}"
 fi
-boot=$2
 if [ "x" = "x${boot}" ]; then
     boot=off
 fi
-deployapp=$3
 if [ "x" = "x${deployapp}" ]; then
     deployapp=${name}
 fi
@@ -93,27 +90,28 @@ done
 
 # PRESTART COPY
 case ${name} in
-    squid|gitlab|builder|buildersquidpkg|builderffmpegpkg|buildergitlabpkg)
+    squid|builder|buildersquidpkg|builderffmpegpkg|buildergitlabpkg)
         copy_var_ports ${name}
     ;;
-    owncloud)
-        if [         -d /root/local/owncloud ]; then
-            mkdir -p                          $( ioc-pathof ${name} )/root/local/owncloud
-            rsync -qalmP /root/local/owncloud/ $( ioc-pathof ${name} )/root/local/owncloud/
-        fi
-        allowsysvipc ${name}
-    ;;
     gitlab)
+        iocage set allow_sysvipc=1 ${name}
+        copy_var_ports ${name}
         ## only if we are installing via src to cache rubygems
         #copysslselfcert ${name}
         # Set jail ip as FQDN so git-shell works
         grep -v " ${FQDN}" $( ioc-pathof ${name} )/etc/hosts >$( ioc-pathof ${name} )/etc/hosts.tmp
         cat $( ioc-pathof ${name} )/etc/hosts.tmp >$( ioc-pathof ${name} )/etc/hosts
         echo "${IPNET}`jailip gitlab` ${FQDN}" >>$( ioc-pathof ${name} )/etc/hosts
-        allowsysvipc ${name}
+    ;;
+    owncloud)
+        iocage set allow_sysvipc=1 ${name}
+        if [         -d /root/local/owncloud ]; then
+            mkdir -p                          $( ioc-pathof ${name} )/root/local/owncloud
+            rsync -qalmP /root/local/owncloud/ $( ioc-pathof ${name} )/root/local/owncloud/
+        fi
     ;;
     horde)
-        allowsysvipc ${name}
+        iocage set allow_sysvipc=1 ${name}
     ;;
 esac
 
@@ -122,7 +120,7 @@ iocage set boot=${boot} ${name}
 
 # AFTER START COPY
 case ${name} in
-    squid|gitlab|builder|buildersquidpkg|builderffmpegpkg|buildergitlabpkg)
+    builder|buildersquidpkg|builderffmpegpkg|buildergitlabpkg)
         save_var_ports ${name}
     ;;
     owncloud)
