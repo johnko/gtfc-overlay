@@ -41,7 +41,7 @@ build_it_now() {
 #deploy_gitlab_runtimedeps
 
 # Build dependencies
-#deploy_gitlab_builddeps
+deploy_gitlab_builddeps
 
 OLDPORTPATHS="
 www/rubygem-activeresource4-rails41

@@ -2,6 +2,13 @@
 
 # READY
 
+pkg install -y \
+bash \
+cmake \
+lang/go
+
+exit 0
+
 # Build dependencies
 pkg install -y \
 autoconf \
