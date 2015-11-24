@@ -16,7 +16,8 @@ fi
 
 
 if [ ! -d ${HOME}/gitlabports ]; then
-    git clone --depth 1 ${REPOSRC}/freebsd-ports-test.git -b gitlab-7.14.3 ${HOME}/gitlabports
+    #git clone --depth 1 ${REPOSRC}/freebsd-ports-test.git -b gitlab-7.14.3 ${HOME}/gitlabports
+    git clone --depth 1 ${REPOSRC}/gitlab-freebsd-port.git ${HOME}/gitlabports
 fi
 rsync -virthP --exclude .git  ${HOME}/gitlabports/  /usr/ports/
 
@@ -40,9 +41,9 @@ build_it_now() {
 deploy_gitlab_runtimedeps
 
 # Build dependencies
-deploy_gitlab_builddeps
+#deploy_gitlab_builddeps
 
-PORTPATHS="
+OLDPORTPATHS="
 www/rubygem-activeresource4-rails41
 www/rubygem-acts-as-taggable-on3-rails41
 www/rubygem-asana-rails41
@@ -82,7 +83,10 @@ textproc/rubygem-sass-rails41
 databases/rubygem-seed-fu-rails41
 devel/rubygem-sprockets-rails41
 www/rubygem-task_list-rails41
-www/gitlab/
+www/gitlab
+"
+PORTPATHS="
+www/gitlab
 "
 
 for i in ${PORTPATHS} ; do

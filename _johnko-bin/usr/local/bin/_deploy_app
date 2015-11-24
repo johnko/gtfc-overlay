@@ -78,7 +78,7 @@ case ${name} in
         iocage set allow_sysvipc=1 ${name}
         copy_var_ports ${name}
         ## only if we are installing via src to cache rubygems
-        #copysslselfcert ${name}
+        copysslselfcert ${name}
         # Set jail ip as FQDN so git-shell works
         grep -v " ${FQDN}" $( ioc-pathof ${name} )/etc/hosts >$( ioc-pathof ${name} )/etc/hosts.tmp
         cat $( ioc-pathof ${name} )/etc/hosts.tmp >$( ioc-pathof ${name} )/etc/hosts
