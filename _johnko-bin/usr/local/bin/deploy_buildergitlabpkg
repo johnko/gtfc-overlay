@@ -86,7 +86,7 @@ www/gitlab/
 "
 
 for i in ${PORTPATHS} ; do
-    if [ "x" != "x${i}" ] && [ -d ${i} ]; then
+    if [ "x" != "x${i}" ] && [ -d /usr/ports/${i} ]; then
         build_it_now ${i}
     fi
 done
