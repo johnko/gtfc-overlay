@@ -2,5 +2,6 @@
 
 # READY
 
-deploy_buildersquid
-deploy_builderffmpeg
+deploy_buildersquidpkg
+deploy_builderffmpegpkg
+# deploy_buildergitlabpkg
