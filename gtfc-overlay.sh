@@ -163,8 +163,9 @@ compare_old_new 'crontabbed' && users_crontabbed
 
 ## iocage fetch doesn't work if called during git push
 ## workaround is to start them in tmux
-[ -e /etc/rc.conf.d/iocage ] && tmux new-window -d ioc-setup
 ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 && tmux new-window -d _deploy_jails
+## let _deploy_jails handle the ioc-setup
+#[ -e /etc/rc.conf.d/iocage ] && tmux new-window -d ioc-setup
 
 ## restarting or reloading services doesn't work if called during git push
 ## workaround is to start them in tmux
