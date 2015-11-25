@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# modified from https://github.com/yonas/gitlab-freebsd-port
+
 GITLAB_USER=git
 GITLAB_GROUP=git
 GITLAB_BASE=/usr/local/gitlab
@@ -324,6 +326,12 @@ start_nginx ()
     echo "
 Visit http://${FQDN} in your web browser for your first GitLab login. The setup has created a default admin account for you. You can use it to log in:
 "
+    if [ "x" = "x${ROOTPASS}" ]; then
+        echo "
+username: root
+password: 5iveL!fe
+"
+    fi
 }
 
 install_bundler
