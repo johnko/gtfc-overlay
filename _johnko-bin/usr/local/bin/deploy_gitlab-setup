@@ -261,7 +261,7 @@ initialise_database ()
         # If you don't set the password (and it is set to the default one) please wait with exposing GitLab to the public internet until the
         # installation is done and you've logged into the server the first time. During the first login you'll be forced to change the default password.
         #sudo -u ${GITLAB_USER} -H bundle exec rake gitlab:setup RAILS_ENV=production GITLAB_ROOT_PASSWORD=yourpassword
-        yes yes | sudo -u ${GITLAB_USER} -H env HTTP_PROXY=${HTTP_PROXY} bundle exec rake gitlab:setup RAILS_ENV=production GITLAB_ROOT_PASSWORD=${ROOTPASS}
+        yes yes | sudo -u ${GITLAB_USER} -H env HTTP_PROXY=http://${SQUID} bundle exec rake gitlab:setup RAILS_ENV=production GITLAB_ROOT_PASSWORD=${ROOTPASS}
     fi
 }
 
@@ -338,12 +338,14 @@ install_bundler
 #setup_rc_conf
 #setup_postgres
 #setup_redis
+deploy_squid_sslcert_append
 setup_gitlab
 setup_gitlab_shell
 install_git_server
 initialise_database
 check_configuration
 compile_assets
+deploy_squid_sslcert_revert
 start_gitlab
 configure_nginx
 start_nginx

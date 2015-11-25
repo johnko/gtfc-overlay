@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /usr/local/bin/loadmyvars.sh
+
 name=$1
 boot=$2
 deployapp=$3
@@ -14,20 +16,6 @@ copy_var_ports() {
 save_var_ports() {
     local name=$1
     rsync -qalmP --exclude work $( ioc-pathof ${name} )/var/ports/ /var/ports/
-}
-
-copysslselfcert() {
-    if [ "x" != "x${HTTP_PROXY}" ]; then
-        PROXYIP=$( echo $HTTP_PROXY | awk -F/ '{print $NF}' | awk -F: '{print $1}' )
-        if [ "x10.7.7.1" = "$PROXYIP" ]; then
-            cat $( ioc-pathof squid )/usr/local/etc/squid/public.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
-        else
-            curl --output $( ioc-pathof ${1} )/root/public-${PROXYIP}.pem http://${PROXYIP}:3127/public.pem
-            cat           $( ioc-pathof ${1} )/root/public-${PROXYIP}.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
-        fi
-    else
-        cat $( ioc-pathof squid )/usr/local/etc/squid/public.pem >>$( ioc-pathof ${1} )/usr/local/share/certs/ca-root-nss.crt
-    fi
 }
 
 if [ "x" = "x${NIC}" ]; then
@@ -78,7 +66,7 @@ case ${name} in
         iocage set allow_sysvipc=1 ${name}
         copy_var_ports ${name}
         ## only if we are installing via src to cache rubygems
-        copysslselfcert ${name}
+        deploy_squid_sslcert_fetch ${name}
         # Set jail ip as FQDN so git-shell works
         grep -v " ${FQDN}" $( ioc-pathof ${name} )/etc/hosts >$( ioc-pathof ${name} )/etc/hosts.tmp
         cat $( ioc-pathof ${name} )/etc/hosts.tmp >$( ioc-pathof ${name} )/etc/hosts

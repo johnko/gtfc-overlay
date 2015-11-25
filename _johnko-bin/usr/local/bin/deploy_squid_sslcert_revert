@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ -e /root/local/ca-root-nss.crt.orig ]; then
+    cat /root/local/ca-root-nss.crt.orig > /usr/local/share/certs/ca-root-nss.crt
+    rm /root/local/ca-root-nss.crt.orig
+fi

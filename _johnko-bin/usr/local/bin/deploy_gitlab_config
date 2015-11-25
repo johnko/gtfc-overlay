@@ -16,11 +16,11 @@ if [ "x" != "x${GITLABDBPASS}" ]; then
     DBPASS=${GITLABDBPASS}
 fi
 
-if [ "x" == "x${HTTP_PROXY}" ]; then
-    echo "ERROR: expecting HTTP_PROXY"
-    exit 1
-fi
-if [ "x" == "x${GITLABPKG}" ]; then
+#if [ "x" = "x${HTTP_PROXY}" ]; then
+#    echo "ERROR: expecting HTTP_PROXY"
+#    exit 1
+#fi
+if [ "x" = "x${GITLABPKG}" ]; then
     echo "ERROR: GITLABPKG not defined."
     exit 1
 fi

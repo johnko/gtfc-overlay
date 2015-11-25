@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ -e /root/local/squidca.crt ]; then
+    cat /usr/local/share/certs/ca-root-nss.crt > /root/local/ca-root-nss.crt.orig
+    cat /root/local/squidca.crt >> /usr/local/share/certs/ca-root-nss.crt
+fi
