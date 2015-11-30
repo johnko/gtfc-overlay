@@ -217,7 +217,7 @@ setup_gitlab ()
     sudo -u ${GITLAB_USER} -H cp config/database.yml.postgresql config/database.yml
 
     # Install Ruby Gems
-    sudo -u ${GITLAB_USER} -H bundle install --deployment --without development test mysql aws
+    sudo -u ${GITLAB_USER} -H env HTTP_PROXY=http://${SQUID} bundle install --deployment --without development test mysql aws
 }
 
 
