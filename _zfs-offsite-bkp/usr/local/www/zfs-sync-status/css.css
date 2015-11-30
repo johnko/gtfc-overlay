@@ -6,3 +6,8 @@ iframe {
 .footer {
     text-align: right;
 }
+
+.monospace-pre {
+    white-space: pre;
+    overflow: scroll;
+}

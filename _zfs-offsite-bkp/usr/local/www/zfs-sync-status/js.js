@@ -154,27 +154,37 @@ function timer_fetch_snapshots() {
     var seconds = minutes * 60;
     var ms = seconds * 1000;
     fetch_snapshots();
+    fetch_ramusage();
+    fetch_poolspace();
+    fetch_poolstatus();
+    fetch_tankspace();
+    fetch_tankstatus();
     global_timer = setTimeout(function(){ timer_fetch_snapshots(); }, ms);
+}
+function labelFormatter(label, series) {
+    return "<div style='text-align:center; padding:2px; color:black;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
 }
 function parse_space(selector,data) {
     var plotObj = $.plot($(selector), data, {
         series: {
             pie: {
-                show: true
+                show: true,
+                radius: 1,
+                label: {
+                    show: true,
+                    radius: 2/3,
+                    formatter: labelFormatter,
+                    threshold: 0.1
+                }
             }
         },
-        grid: {
-            hoverable: true
+        legend: {
+            show: false
         },
-        tooltip: true,
-        tooltipOpts: {
-            content: "%p.0%, %s", // show percentages, rounding to 2 decimal places
-            shifts: {
-                x: 20,
-                y: 0
-            },
-            defaultTheme: false
-        }
+        grid: {
+            hoverable: false
+        },
+        tooltip: false
     });
 }
 function fetch_ramusage() {
@@ -201,23 +211,34 @@ function fetch_tankspace() {
         parse_space("#flot-pie-charttank",data);
     });
 }
+function fetch_poolstatus() {
+    $.ajax({
+        url: "./poolstatus.txt",
+        dataType: "text"
+    }).success(function(data) {
+        $("#zpoolstatuspool").text(data);
+    });
+}
+function fetch_tankstatus() {
+    $.ajax({
+        url: "./tankstatus.txt",
+        dataType: "text"
+    }).success(function(data) {
+        $("#zpoolstatustank").text(data);
+    });
+}
 
 
 function doc_load() {
 
-    // scroll down logs
-    all_frames_scrolldown();
-    // start time to fetch logs
-    timer_reload_frames();
-
     // setup placeholders
     fetch_datasets();
 
-    // fetch real data
+    // start timer to fetch logs
+    timer_reload_frames();
+
+    // start timer to fetch real data
     timer_fetch_snapshots();
-    fetch_ramusage();
-    fetch_poolspace();
-    fetch_tankspace();
 }
 $(document).ready(function(){ doc_load(); });
 //$(window).on('load', function(){ doc_load(); });
