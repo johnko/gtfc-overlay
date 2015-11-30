@@ -375,3 +375,39 @@
 /usr/local/etc/deploypfucarp.conf.d/zabbix                root      wheel     644
 
 /usr/local/etc/mdnsresponder.conf                         root      wheel     644
+
+/usr/local/etc/nginx                                      root      wheel     755
+
+/usr/local/etc/nginx/sites-enabled                        root      wheel     755
+/usr/local/etc/nginx/sites-enabled/zfs-offsite-bkp        root      wheel     644
+
+/usr/local/www                                            root      wheel     755
+
+/usr/local/www/public                                     root      wheel     755
+/usr/local/www/public/LICENSE                             root      wheel     644
+/usr/local/www/public/bootstrap.css                       root      wheel     644
+/usr/local/www/public/bootstrap.js                        root      wheel     644
+/usr/local/www/public/css.css                             root      wheel     644
+/usr/local/www/public/font-awesome.css                    root      wheel     644
+
+/usr/local/www/public/fonts                               root      wheel     755
+/usr/local/www/public/fonts/FontAwesome.otf               root      wheel     644
+/usr/local/www/public/fonts/fontawesome-webfont.eot       root      wheel     644
+/usr/local/www/public/fonts/fontawesome-webfont.svg       root      wheel     644
+/usr/local/www/public/fonts/fontawesome-webfont.ttf       root      wheel     644
+/usr/local/www/public/fonts/fontawesome-webfont.woff      root      wheel     644
+
+/usr/local/www/public/index.html                          root      wheel     644
+/usr/local/www/public/index0.html                         root      wheel     644
+/usr/local/www/public/index1.html                         root      wheel     644
+/usr/local/www/public/jquery.js                           root      wheel     644
+/usr/local/www/public/js.js                               root      wheel     644
+/usr/local/www/public/metisMenu.css                       root      wheel     644
+/usr/local/www/public/metisMenu.js                        root      wheel     644
+/usr/local/www/public/morris-data.js                      root      wheel     644
+/usr/local/www/public/morris.css                          root      wheel     644
+/usr/local/www/public/morris.js                           root      wheel     644
+/usr/local/www/public/raphael.js                          root      wheel     644
+/usr/local/www/public/sb-admin-2.css                      root      wheel     644
+/usr/local/www/public/sb-admin-2.js                       root      wheel     644
+/usr/local/www/public/timeline.css                        root      wheel     644
