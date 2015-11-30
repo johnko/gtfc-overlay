@@ -16,6 +16,10 @@ var pies = [
 // Log files
 var count_frames = 6;
 
+function find_replace_tank_urep(str) {
+    var res = str.replace("tank/urep/","");
+    return res;
+}
 function scrolldown_frame(selector) {
     var contents = $(selector).contents();
     contents.scrollTop(contents.height());
@@ -47,7 +51,7 @@ function add_coloricontxt_placeholder(datasets) {
     $("#coloricontxt").empty();
     for (var i=0; i<datasets.length; i++) {
         var newdiv = $("<div>");
-        newdiv.attr("id","zfsdataset"+(datasets[i].name));
+        newdiv.attr("id","zfsdataset"+find_replace_tank_urep(datasets[i].name));
         $("#coloricontxt").append(newdiv);
     }
     default_all_coloricontxt(datasets);
@@ -98,7 +102,7 @@ function set_coloricontxt(selector,color,icon,txt,subtxt) {
 }
 function default_all_coloricontxt(datasets) {
     for (var i=0; i<datasets.length; i++) {
-        set_coloricontxt('#zfsdataset'+(datasets[i].name), "yellow", "question", datasets[i].name, "loading...");
+        set_coloricontxt('#zfsdataset'+find_replace_tank_urep(datasets[i].name), "yellow", "question", find_replace_tank_urep(datasets[i].name), "loading...");
     }
 }
 function test_all_coloricontxt(datasets) {
@@ -113,7 +117,7 @@ function test_all_coloricontxt(datasets) {
         for ( ; icon_i >= icons.length; icon_i-=icons.length ){
             //nop
         }
-        set_coloricontxt('#zfsdataset'+(datasets[i].name), colors[color_i], icons[icon_i], datasets[i].name, "testing");
+        set_coloricontxt('#zfsdataset'+find_replace_tank_urep(datasets[i].name), colors[color_i], icons[icon_i], find_replace_tank_urep(datasets[i].name), "testing");
     }
 }
 function parse_coloricontxt_dataset(datasets) {
@@ -127,7 +131,7 @@ function parse_coloricontxt_dataset(datasets) {
             color = "red";
             icon = "times";
         }
-        set_coloricontxt('#zfsdataset'+(datasets[i].name), color, icon, datasets[i].name, "local:"+datasets[i].local+"<br/>remote:"+datasets[i].remote);
+        set_coloricontxt('#zfsdataset'+find_replace_tank_urep(datasets[i].name), color, icon, find_replace_tank_urep(datasets[i].name), "local:"+datasets[i].local+"<br/>remote:"+datasets[i].remote);
     }
 }
 function fetch_datasets() {
