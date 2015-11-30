@@ -1,5 +1,18 @@
 var global_timer;
-
+var pies = [
+    {
+        name:"ram",
+        text:"RAM Usage"
+    },
+    {
+        name:"pool",
+        text:"Operating System Disk Space"
+    },
+    {
+        name:"tank",
+        text:"Data Storage Disk Space"
+    }
+];
 // Log files
 var count_frames = 6;
 
@@ -19,9 +32,6 @@ function all_frames_scrolldown() {
         scrolldown_frame('#frame'+(i+1));
     }
 }
-function all_frames_configure() {
-    all_frames_scrolldown();
-}
 function timer_reload_frames() {
     var hours = 1;
     var minutes = hours * 60;
@@ -33,11 +43,11 @@ function timer_reload_frames() {
     setTimeout(function(){ all_frames_scrolldown(); }, 1000);
     global_timer = setTimeout(function(){ timer_reload_frames(); }, ms);
 }
-function add_coloricontxt(datasets) {
+function add_coloricontxt_placeholder(datasets) {
     $("#coloricontxt").empty();
     for (var i=0; i<datasets.length; i++) {
         var newdiv = $("<div>");
-        newdiv.attr("id","zfsdataset"+(i+1));
+        newdiv.attr("id","zfsdataset"+(datasets[i].name));
         $("#coloricontxt").append(newdiv);
     }
     default_all_coloricontxt(datasets);
@@ -88,7 +98,7 @@ function set_coloricontxt(selector,color,icon,txt,subtxt) {
 }
 function default_all_coloricontxt(datasets) {
     for (var i=0; i<datasets.length; i++) {
-        set_coloricontxt('#zfsdataset'+(i+1), "yellow", "question", datasets[i].name, "loading...");
+        set_coloricontxt('#zfsdataset'+(datasets[i].name), "yellow", "question", datasets[i].name, "loading...");
     }
 }
 function test_all_coloricontxt(datasets) {
@@ -103,7 +113,7 @@ function test_all_coloricontxt(datasets) {
         for ( ; icon_i >= icons.length; icon_i-=icons.length ){
             //nop
         }
-        set_coloricontxt('#zfsdataset'+(i+1), colors[color_i], icons[icon_i], datasets[i].name, "testing");
+        set_coloricontxt('#zfsdataset'+(datasets[i].name), colors[color_i], icons[icon_i], datasets[i].name, "testing");
     }
 }
 function parse_coloricontxt_dataset(datasets) {
@@ -117,7 +127,7 @@ function parse_coloricontxt_dataset(datasets) {
             color = "red";
             icon = "times";
         }
-        set_coloricontxt('#zfsdataset'+(i+1), color, icon, datasets[i].name, "local:"+datasets[i].local+"<br/>remote:"+datasets[i].remote);
+        set_coloricontxt('#zfsdataset'+(datasets[i].name), color, icon, datasets[i].name, "local:"+datasets[i].local+"<br/>remote:"+datasets[i].remote);
     }
 }
 function fetch_datasets() {
@@ -125,7 +135,7 @@ function fetch_datasets() {
         url: "./json-datasets.js",
         dataType: "json"
     }).success(function(data) {
-        add_coloricontxt(data);
+        add_coloricontxt_placeholder(data);
         //test_all_coloricontxt(data);
         //parse_coloricontxt_dataset(data);
     });
@@ -172,7 +182,7 @@ function fetch_ramusage() {
         url: "./json-ramusage.js",
         dataType: "json"
     }).success(function(data) {
-        parse_space("#flot-pie-chart1",data);
+        parse_space("#flot-pie-chartram",data);
     });
 }
 function fetch_poolspace() {
@@ -180,7 +190,7 @@ function fetch_poolspace() {
         url: "./json-poolspace.js",
         dataType: "json"
     }).success(function(data) {
-        parse_space("#flot-pie-chart2",data);
+        parse_space("#flot-pie-chartpool",data);
     });
 }
 function fetch_tankspace() {
@@ -188,14 +198,22 @@ function fetch_tankspace() {
         url: "./json-tankspace.js",
         dataType: "json"
     }).success(function(data) {
-        parse_space("#flot-pie-chart3",data);
+        parse_space("#flot-pie-charttank",data);
     });
 }
 
+
 function doc_load() {
-    all_frames_configure();
+
+    // scroll down logs
+    all_frames_scrolldown();
+    // start time to fetch logs
     timer_reload_frames();
+
+    // setup placeholders
     fetch_datasets();
+
+    // fetch real data
     timer_fetch_snapshots();
     fetch_ramusage();
     fetch_poolspace();
