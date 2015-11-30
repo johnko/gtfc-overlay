@@ -84,15 +84,19 @@ function set_coloricontxt(selector,color,icon,txt,subtxt) {
 
     var ico = $("<i>");
     ico.attr("class","fa fa-"+ icon +" fa-2x");
-    $(colico).empty().append(ico);
 
     var coltxt = $("<div>");
     coltxt.attr("class","col-xs-9 text-right");
 
+    var hugetxt = $("<div>");
+    hugetxt.attr("class","huge");
+    hugetxt.text(subtxt.replace("local:","").replace(/-.*/,""));
+
     var divtxt = $("<div>");
     divtxt.text(txt);
-    $(coltxt).empty().append(divtxt);
 
+    $(colico).empty().append(ico);
+    $(coltxt).empty().append(hugetxt).append(divtxt);
     $(row).empty().append(colico).append(coltxt);
     $(heading).empty().append(row);
     $(footer).empty().append(details).append(clrfix);
@@ -166,7 +170,7 @@ function timer_fetch_snapshots() {
     global_timer = setTimeout(function(){ timer_fetch_snapshots(); }, ms);
 }
 function labelFormatter(label, series) {
-    return "<div style='text-align:center; padding:2px; color:black;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
+    return "<div style='text-align: center; font-size: 2em; font-weight: bold;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
 }
 function parse_space(selector,data) {
     var plotObj = $.plot($(selector), data, {
