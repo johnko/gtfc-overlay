@@ -2,6 +2,8 @@
 
 # modified from https://github.com/yonas/gitlab-freebsd-port
 
+. /usr/local/bin/loadmyvars.sh
+
 GITLAB_USER=git
 GITLAB_GROUP=git
 GITLAB_BASE=/usr/local/gitlab
@@ -223,7 +225,7 @@ setup_gitlab_shell ()
 {
     cd ${GITLAB_DIR}
     # Run the rake task for installing gitlab-shell
-    sudo -u ${GITLAB_USER} -H bundle exec rake gitlab:shell:install[v2.6.5] REDIS_URL=unix:/usr/local/var/run/redis/redis.sock RAILS_ENV=production
+    sudo -u ${GITLAB_USER} -H env HTTP_PROXY=http://${SQUID} bundle exec rake gitlab:shell:install[v2.6.5] REDIS_URL=unix:/usr/local/var/run/redis/redis.sock RAILS_ENV=production
 
     # Edit the gitlab-shell config
     cd ${GITLAB_BASE}/gitlab-shell
@@ -253,7 +255,7 @@ initialise_database ()
     cd ${GITLAB_DIR}
     if [ "x" = "x${ROOTPASS}" ]; then
         # Initialize Database and Activate Advanced Features
-        sudo -u ${GITLAB_USER} -H bundle exec rake gitlab:setup RAILS_ENV=production
+        sudo -u ${GITLAB_USER} -H env HTTP_PROXY=http://${SQUID} bundle exec rake gitlab:setup RAILS_ENV=production
     else
         # Type 'yes' to create the database tables.
         # When done you see 'Administrator account created:'
@@ -273,7 +275,7 @@ check_configuration ()
 {
     cd ${GITLAB_DIR}
     echo "If this all passes (all green and/or no errors are reported), then go ahead and compile all of the assets for GitLab."
-    sudo -u ${GITLAB_USER} -H bundle exec rake gitlab:env:info RAILS_ENV=production
+    sudo -u ${GITLAB_USER} -H env HTTP_PROXY=http://${SQUID} bundle exec rake gitlab:env:info RAILS_ENV=production
 }
 
 
@@ -284,7 +286,7 @@ compile_assets ()
 {
     cd ${GITLAB_DIR}
     echo "This can take ~10-15 minutes on a smaller machine, so don't panic if it takes a while!"
-    sudo -u ${GITLAB_USER} -H bundle exec rake assets:precompile RAILS_ENV=production
+    sudo -u ${GITLAB_USER} -H env HTTP_PROXY=http://${SQUID} bundle exec rake assets:precompile RAILS_ENV=production
 }
 
 
