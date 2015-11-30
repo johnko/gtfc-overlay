@@ -90,7 +90,7 @@ function set_coloricontxt(selector,color,icon,txt,subtxt) {
 
     var hugetxt = $("<div>");
     hugetxt.attr("class","huge");
-    hugetxt.text(subtxt.replace("local:","").replace(/-.*/,""));
+    hugetxt.text(subtxt.replace("local:","").replace(/-.*/,"").replace("loading...",""));
 
     var divtxt = $("<div>");
     divtxt.text(txt);
