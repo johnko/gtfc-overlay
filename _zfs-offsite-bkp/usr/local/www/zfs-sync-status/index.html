@@ -65,7 +65,40 @@
                             <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                         <li>
-                            <a href="#logs"><i class="fa fa-tasks fa-fw"></i> Logs</a>
+                            <a href="#">
+                                <div>
+                                    <p class="text-center">
+                                        <i class="pull-left fa fa-flash fa-fw"></i> RAM
+                                        <span class="pull-right" id="ramtxt"></span>
+                                    </p>
+                                    <div class="progress progress-striped" id="rambar"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p class="text-center">
+                                        <i class="pull-left fa fa-rocket fa-fw"></i> OS Disk
+                                        <span class="pull-right" id="pooltxt"></span>
+                                    </p>
+                                    <div class="progress progress-striped" id="poolbar"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p class="text-center">
+                                        <i class="pull-left fa fa-database fa-fw"></i> Data Disk
+                                        <span class="pull-right" id="tanktxt"></span>
+                                    </p>
+                                    <div class="progress progress-striped" id="tankbar"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#logs"><i class="fa fa-archive fa-fw"></i> Logs</a>
                         </li>
                     </ul>
                 </div>
@@ -87,58 +120,38 @@
             <div class="row" id="coloricontxt"></div>
             <!-- /.row -->
             <div class="row">
-                <div class="col-lg-4">
+                <div class="col-lg-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            RAM Usage
+                        <div class="panel-heading text-center">
+                            <i class="pull-left fa fa-hdd-o fa-fw"></i> Operating System ZFS Pool
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <div class="flot-chart">
-                                <div class="flot-chart-content" id="flot-pie-chartram"></div>
+                                <div class="monospace-pre" id="zpoolstatuspool"></div>
                             </div>
                         </div>
                         <!-- /.panel-body -->
                     </div>
                     <!-- /.panel -->
                 </div>
-                <!-- /.col-lg-4 -->
-                <div class="col-lg-4">
+                <!-- /.col-lg-6 -->
+                <div class="col-lg-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Operating System Disk Space
+                        <div class="panel-heading text-center">
+                            <i class="pull-left fa fa-hdd-o fa-fw"></i> Data ZFS Pool
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <div class="flot-chart">
-                                <div class="flot-chart-content" id="flot-pie-chartpool"></div>
+                                <div class="monospace-pre" id="zpoolstatustank"></div>
                             </div>
                         </div>
                         <!-- /.panel-body -->
-                        <div class="panel-footer monospace-pre" id="zpoolstatuspool"></div>
-                        <!-- /.panel-footer -->
                     </div>
                     <!-- /.panel -->
                 </div>
-                <!-- /.col-lg-4 -->
-                <div class="col-lg-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Data Storage Disk Space
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="flot-chart">
-                                <div class="flot-chart-content" id="flot-pie-charttank"></div>
-                            </div>
-                        </div>
-                        <!-- /.panel-body -->
-                        <div class="panel-footer monospace-pre" id="zpoolstatustank"></div>
-                        <!-- /.panel-footer -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-4 -->
+                <!-- /.col-lg-6 -->
             </div>
             <!-- /.row -->
             <div class="row">
@@ -159,8 +172,8 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-clock-o fa-fw"></i> Today's Progress Log
+                        <div class="panel-heading text-center">
+                            <i class="pull-left fa fa-clock-o fa-fw"></i> Progress Log
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body2">
@@ -173,8 +186,8 @@
                 <!-- /.col-lg-8 -->
                 <div class="col-lg-4">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-trash fa-fw"></i> Today's Prune Log
+                        <div class="panel-heading text-center">
+                            <i class="pull-left fa fa-trash fa-fw"></i> Prune Log
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body2">
@@ -197,8 +210,8 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-clock-o fa-fw"></i> Yesterday's Progress Log
+                        <div class="panel-heading text-center">
+                            <i class="pull-left fa fa-clock-o fa-fw"></i> Progress Log
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body2">
@@ -211,8 +224,8 @@
                 <!-- /.col-lg-8 -->
                 <div class="col-lg-4">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-trash fa-fw"></i> Yesterday's Prune Log
+                        <div class="panel-heading text-center">
+                            <i class="pull-left fa fa-trash fa-fw"></i> Prune Log
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body2">
@@ -235,8 +248,8 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-clock-o fa-fw"></i> 2 Days Ago Progress Log
+                        <div class="panel-heading text-center">
+                            <i class="pull-left fa fa-clock-o fa-fw"></i> Progress Log
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body2">
@@ -249,8 +262,8 @@
                 <!-- /.col-lg-8 -->
                 <div class="col-lg-4">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-trash fa-fw"></i> 2 Days Ago Prune Log
+                        <div class="panel-heading text-center">
+                            <i class="pull-left fa fa-trash fa-fw"></i> Prune Log
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body2">

@@ -172,12 +172,13 @@ function timer_fetch_snapshots() {
 function labelFormatter(label, series) {
     return "<div style='text-align: center; font-size: 2em; font-weight: bold;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
 }
-function parse_space(selector,data) {
+function parse_space_pie(selector, data) {
     var plotObj = $.plot($(selector), data, {
         series: {
             pie: {
                 show: true,
                 radius: 1,
+                tilt: 0.3,
                 label: {
                     show: true,
                     radius: 2/3,
@@ -195,12 +196,40 @@ function parse_space(selector,data) {
         tooltip: false
     });
 }
+function parse_space_bar(prefix, data) {
+    var used = "?";
+    var color = "info";
+    for (var i=0; i<data.length; i++) {
+        if (data[i].label == "Used") {
+            used = data[i].data;
+        }
+    }
+    if (used < 50) { color = "success"; }
+    if (used >= 50) { color = "warning"; }
+    if (used >= 80) { color = "danger"; }
+    $("#"+prefix+"txt").text(used+"%");
+    var pbar = $("<div>");
+    pbar.attr("class","progress-bar progress-bar-"+color);
+    pbar.attr("role","progressbar");
+    pbar.attr("aria-valuenow",used);
+    pbar.attr("aria-valuemin",0);
+    pbar.attr("aria-valuemax",100);
+    pbar.attr("style","width: "+used+"%");
+
+    var screenreader = $("<span>");
+    screenreader.attr("class","sr-only");
+    screenreader.text(used+"%");
+
+    $(pbar).empty().append(screenreader);
+    $("#"+prefix+"bar").empty().append(pbar);
+}
 function fetch_ramusage() {
     $.ajax({
         url: "./json-ramusage.js",
         dataType: "json"
     }).success(function(data) {
-        parse_space("#flot-pie-chartram",data);
+        //parse_space_pie("#flot-pie-chartram",data);
+        parse_space_bar("ram",data);
     });
 }
 function fetch_poolspace() {
@@ -208,7 +237,8 @@ function fetch_poolspace() {
         url: "./json-poolspace.js",
         dataType: "json"
     }).success(function(data) {
-        parse_space("#flot-pie-chartpool",data);
+        //parse_space_pie("#flot-pie-chartpool",data);
+        parse_space_bar("pool",data);
     });
 }
 function fetch_tankspace() {
@@ -216,7 +246,8 @@ function fetch_tankspace() {
         url: "./json-tankspace.js",
         dataType: "json"
     }).success(function(data) {
-        parse_space("#flot-pie-charttank",data);
+        //parse_space_pie("#flot-pie-charttank",data);
+        parse_space_bar("tank",data);
     });
 }
 function fetch_poolstatus() {
