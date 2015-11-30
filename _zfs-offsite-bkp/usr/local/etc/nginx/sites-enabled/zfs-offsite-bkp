@@ -1,0 +1,13 @@
+server {
+    listen 80 default_server;
+    server_name localhost.localdomain;
+    access_log  /var/log/nginx-access.log realip;
+    error_log   /var/log/nginx-error.log;
+    root /usr/local/www/public;
+    location =/sync.txt   { alias /var/log/zfs-sync-xz-pull-all.log  ; }
+    location =/sync.0.txt { alias /var/log/zfs-sync-xz-pull-all.log.0; }
+    location =/sync.1.txt { alias /var/log/zfs-sync-xz-pull-all.log.1; }
+    location =/prune.txt   { alias /var/log/zsnaprune-all.log  ; }
+    location =/prune.0.txt { alias /var/log/zsnaprune-all.log.0; }
+    location =/prune.1.txt { alias /var/log/zsnaprune-all.log.1; }
+}
