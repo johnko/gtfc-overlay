@@ -42,17 +42,50 @@ if [ "x" == "x${FQDN}" ]; then
 fi
 
 
-echo 1.a Dependencies
+if sysctl security.jail.jailed | grep 1 >/dev/null ; then
+    echo === postfix
+    deploy_postfix
+fi
 
+
+echo === postgresql
+deploy_postgresql94 1100 ${DB} ${DBUSER} ${DBPASS}
+
+
+echo === redis
+deploy_redis_unix
+
+
+echo === Other services: SSH
+if sysctl security.jail.jailed | grep 1 >/dev/null ; then
+    cat /etc/ssh/sshd_config \
+    | sed 's/#Port 22/Port 23/' \
+    >/etc/ssh/sshd_config.tmp
+    cat /etc/ssh/sshd_config.tmp >/etc/ssh/sshd_config
+    rm /etc/ssh/sshd_config.tmp
+fi
+sshd-config
+service sshd start
+
+
+if sysctl security.jail.jailed | grep 0 >/dev/null ; then
+    echo === openntpd
+    sysrc openntpd_enable="YES"
+    service openntpd start
+
+    echo === nginx
+    deploy_nginx
+fi
+
+
+echo === dependencies
 #deploy_gitlab_runtimedeps
 deploy_gitlab_deps
-
 # for this script
 pkg install -y sudo
 
 
-echo 1.b Package
-
+echo === package
 if [ -e ${GITLABPKG} ]; then
     if ! pkg add ${GITLABPKG} ; then
         echo "ERROR: gitlab install failed"
@@ -61,18 +94,11 @@ if [ -e ${GITLABPKG} ]; then
 fi
 
 
-echo 2 postgresql
-deploy_postgresql94 1100 ${DB} ${DBUSER} ${DBPASS}
-
-
-echo 3 redis
-
-deploy_redis_unix
 # Add git user to redis group
 pw groupmod redis -m git
 
 
-echo 4 gitlab
+#echo === gitlab config
 # Become git user
 #su git
 # Go to GitLab installation folder
@@ -118,8 +144,7 @@ echo 4 gitlab
 #sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:shell:install[v2.6.3] REDIS_URL=unix:/var/run/redis/redis.sock RAILS_ENV=production
 
 
-echo 8 Initialise Database
-
+echo === gitlab setup
 #yes yes | sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:setup RAILS_ENV=production GITLAB_ROOT_PASSWORD=${ROOTPASS}
 # Check Application Status
 #sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake gitlab:env:info RAILS_ENV=production
@@ -127,34 +152,6 @@ echo 8 Initialise Database
 #sudo -u git -H env HTTP_PROXY=${HTTP_PROXY} rake assets:precompile RAILS_ENV=production
 
 deploy_gitlab-setup
-
-if sysctl security.jail.jailed | grep 0 >/dev/null ; then
-    echo Other services: openntpd
-    sysrc openntpd_enable="YES"
-    service openntpd start
-
-    echo Other services: nginx
-    deploy_nginx
-fi
-
-
-echo Other services: SSH
-
-if sysctl security.jail.jailed | grep 1 >/dev/null ; then
-    cat /etc/ssh/sshd_config \
-    | sed 's/#Port 22/Port 23/' \
-    >/etc/ssh/sshd_config.tmp
-    cat /etc/ssh/sshd_config.tmp >/etc/ssh/sshd_config
-    rm /etc/ssh/sshd_config.tmp
-fi
-sshd-config
-service sshd start
-
-
-if sysctl security.jail.jailed | grep 1 >/dev/null ; then
-    echo Other services: MAIL
-    deploy_postfix
-fi
 
 
 echo
