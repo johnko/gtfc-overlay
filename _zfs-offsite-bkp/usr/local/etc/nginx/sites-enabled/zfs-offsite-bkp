@@ -3,7 +3,12 @@ server {
     server_name localhost.localdomain;
     access_log  /var/log/nginx-access.log realip;
     error_log   /var/log/nginx-error.log;
-    root /usr/local/www/public;
+    root /usr/local/www/zfs-sync-status;
+    location =/json-datasets.js  { alias /usr/local/www/data/json-datasets.js ; }
+    location =/json-snapshots.js { alias /usr/local/www/data/json-snapshots.js; }
+    location =/json-ramusage.js  { alias /usr/local/www/data/json-ramusage.js ; }
+    location =/json-poolspace.js { alias /usr/local/www/data/json-poolspace.js; }
+    location =/json-tankspace.js { alias /usr/local/www/data/json-tankspace.js; }
     location =/sync.txt   { alias /var/log/zfs-sync-xz-pull-all.log  ; }
     location =/sync.0.txt { alias /var/log/zfs-sync-xz-pull-all.log.0; }
     location =/sync.1.txt { alias /var/log/zfs-sync-xz-pull-all.log.1; }
