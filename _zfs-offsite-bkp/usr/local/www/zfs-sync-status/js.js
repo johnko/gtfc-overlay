@@ -21,8 +21,9 @@ function find_replace_tank_urep(str) {
     return res;
 }
 function scrolldown_frame(selector) {
-    var contents = $(selector).contents();
-    contents.scrollTop(contents.height());
+    //var contents = $(selector).contents();
+    //contents.scrollTop(contents.height());
+    $(selector).scrollTop($(selector)[0].scrollHeight);
 }
 function setsrc_frame(selector) {
     var src = $(selector).attr("src");
@@ -156,19 +157,6 @@ function fetch_snapshots() {
         parse_coloricontxt_dataset(data);
     });
 }
-function timer_fetch_snapshots() {
-    var hours = 1;
-    var minutes = hours * 60;
-    var seconds = minutes * 60;
-    var ms = seconds * 1000;
-    fetch_snapshots();
-    fetch_ramusage();
-    fetch_poolspace();
-    fetch_poolstatus();
-    fetch_tankspace();
-    fetch_tankstatus();
-    global_timer = setTimeout(function(){ timer_fetch_snapshots(); }, ms);
-}
 function labelFormatter(label, series) {
     return "<div style='text-align: center; font-size: 2em; font-weight: bold;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
 }
@@ -266,7 +254,60 @@ function fetch_tankstatus() {
         $("#zpoolstatustank").text(data);
     });
 }
-
+function fetch_logs() {
+    $.ajax({
+        url: "./sync.txt",
+        dataType: "text"
+    }).success(function(data) {
+        $("#frame1").text(data);
+    });
+    $.ajax({
+        url: "./prune.txt",
+        dataType: "text"
+    }).success(function(data) {
+        $("#frame2").text(data);
+    });
+    //-------------------
+    $.ajax({
+        url: "./sync.0.txt",
+        dataType: "text"
+    }).success(function(data) {
+        $("#frame3").text(data);
+    });
+    $.ajax({
+        url: "./prune.0.txt",
+        dataType: "text"
+    }).success(function(data) {
+        $("#frame4").text(data);
+    });
+    //-------------------
+    $.ajax({
+        url: "./sync.1.txt",
+        dataType: "text"
+    }).success(function(data) {
+        $("#frame5").text(data);
+    });
+    $.ajax({
+        url: "./prune.1.txt",
+        dataType: "text"
+    }).success(function(data) {
+        $("#frame6").text(data);
+    });
+}
+function timer_fetch_snapshots() {
+    var hours = 1;
+    var minutes = hours * 60;
+    var seconds = minutes * 60;
+    var ms = seconds * 1000;
+    fetch_snapshots();
+    fetch_ramusage();
+    fetch_poolspace();
+    fetch_poolstatus();
+    fetch_tankspace();
+    fetch_tankstatus();
+    fetch_logs();
+    global_timer = setTimeout(function(){ timer_fetch_snapshots(); }, ms);
+}
 
 function doc_load() {
 
