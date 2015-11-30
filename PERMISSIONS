@@ -116,6 +116,7 @@
 /usr/home/urep/crontabbed/0_PATH                               urep      urep      600
 /usr/home/urep/crontabbed/0_SHELL                              urep      urep      600
 /usr/home/urep/crontabbed/daily-zsnaprune-all                  urep      urep      600
+/usr/home/urep/crontabbed/every2h-stat-json-urep               urep      urep      600
 /usr/home/urep/crontabbed/every2h-zfs-sync-xz-pull-all         urep      urep      600
 
 /usr/local                                                     root      wheel     755
@@ -300,6 +301,7 @@
 /usr/local/bin/stat-disk                                       root      wheel     755
 /usr/local/bin/stat-gpg                                        root      wheel     755
 /usr/local/bin/stat-jail                                       root      wheel     755
+/usr/local/bin/stat-json-urep                                  root      wheel     755
 /usr/local/bin/stat-loop                                       root      wheel     755
 /usr/local/bin/stat-net                                        root      wheel     755
 /usr/local/bin/stat-ram                                        root      wheel     755
