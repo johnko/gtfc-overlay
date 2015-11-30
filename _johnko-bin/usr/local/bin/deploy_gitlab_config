@@ -72,10 +72,11 @@ if sysctl security.jail.jailed | grep 0 >/dev/null ; then
     echo === openntpd
     sysrc openntpd_enable="YES"
     service openntpd start
-
-    echo === nginx
-    deploy_nginx
 fi
+
+
+echo === nginx
+deploy_nginx
 
 
 echo === dependencies

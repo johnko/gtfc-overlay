@@ -4,6 +4,8 @@
 
 . /usr/local/bin/loadmyvars.sh
 
+echo HTTP_PROXY=http://${SQUID}
+
 GITLAB_USER=git
 GITLAB_GROUP=git
 GITLAB_BASE=/usr/local/gitlab
@@ -16,7 +18,7 @@ GITLAB_DIR=/usr/local/gitlab/gitlab
 
 install_bundler ()
 {
-    sudo gem install bundler --no-ri --no-rdoc
+    sudo env HTTP_PROXY=http://${SQUID} gem install bundler --no-ri --no-rdoc
 }
 
 
@@ -181,6 +183,7 @@ setup_gitlab ()
     sudo -u ${GITLAB_USER} -H chmod -R u+rwX tmp/sockets/
 
     # Make sure GitLab can write to the public/uploads/ directory
+    sudo -u ${GITLAB_USER} -H mkdir -p public/uploads
     sudo -u ${GITLAB_USER} -H chmod -R u+rwX  public/uploads
 
     # Copy the example Unicorn config
@@ -336,11 +339,11 @@ password: 5iveL!fe
     fi
 }
 
+deploy_squid_sslcert_append
 install_bundler
 #setup_rc_conf
 #setup_postgres
 #setup_redis
-deploy_squid_sslcert_append
 setup_gitlab
 setup_gitlab_shell
 install_git_server
