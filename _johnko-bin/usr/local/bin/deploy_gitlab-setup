@@ -189,7 +189,7 @@ setup_gitlab ()
     sudo -u ${GITLAB_USER} -H sed -i '' -e "s/worker_processes 3/worker_processes $(sysctl -n hw.ncpu)/g" config/unicorn.rb
 
     # Every reference to /home/git should be set to /usr/local/gitlab
-    sudo -u ${GITLAB_USER} -H sed -i '' -e "s/\/home\/git\//${GITLAB_BASE//\//\\/}\//g" config/unicorn.rb
+    sudo -u ${GITLAB_USER} -H sed -i '' -e "s;/home/git/;${GITLAB_BASE}/;g" config/unicorn.rb
 
     # Copy the example Rack attack config
     sudo -u ${GITLAB_USER} -H cp config/initializers/rack_attack.rb.example config/initializers/rack_attack.rb
@@ -206,7 +206,7 @@ setup_gitlab ()
     # Configure Redis to use the modified socket path
     # Change 'production' line to 'unix:/usr/local/var/run/redis/redis.sock'
     sudo -u ${GITLAB_USER} -H cp config/resque.yml.example config/resque.yml
-    sudo -u ${GITLAB_USER} -H sed -i '' -e 's/^production: unix:\/var\/run\/redis\/redis.sock/production: unix:\/usr\/local\/var\/run\/redis\/redis.sock/g' config/resque.yml
+    sudo -u ${GITLAB_USER} -H sed -i '' -e 's;^production: unix:/var/run/redis/redis.sock;production: unix:/usr/local/var/run/redis/redis.sock;g' config/resque.yml
 
     # Copy database config
     sudo -u ${GITLAB_USER} -H cp config/database.yml.postgresql config/database.yml
@@ -228,7 +228,7 @@ setup_gitlab_shell ()
     # Edit the gitlab-shell config
     cd ${GITLAB_BASE}/gitlab-shell
     # Change the 'socket' option to '/usr/local/var/run/redis/redis.sock'
-    sudo -u ${GITLAB_USER} -H sed -i '' -e 's/socket: "\/var\/run\/redis\/redis.sock"/socket: "\/usr\/local\/var\/run\/redis\/redis.sock"/g' config.yml
+    sudo -u ${GITLAB_USER} -H sed -i '' -e 's;socket: "/var/run/redis/redis.sock";socket: "/usr/local/var/run/redis/redis.sock";g' config.yml
 }
 
 
