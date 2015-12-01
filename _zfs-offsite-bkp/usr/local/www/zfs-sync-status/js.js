@@ -1,18 +1,8 @@
 var global_timer;
-var pies = [
-    {
-        name:"ram",
-        text:"RAM Usage"
-    },
-    {
-        name:"pool",
-        text:"Operating System Disk Space"
-    },
-    {
-        name:"tank",
-        text:"Data Storage Disk Space"
-    }
-];
+var hours = 1;
+var minutes = hours * 60;
+var seconds = minutes * 60;
+var ms = seconds * 1000;
 // Log files
 var count_frames = 6;
 
@@ -36,17 +26,6 @@ function all_frames_scrolldown() {
     for (var i=0; i<count_frames; i++) {
         scrolldown_frame('#frame'+(i+1));
     }
-}
-function timer_reload_frames() {
-    var hours = 1;
-    var minutes = hours * 60;
-    var seconds = minutes * 60;
-    var ms = seconds * 1000;
-    for (var i=0; i<count_frames; i++) {
-        setsrc_frame('#frame'+(i+1));
-    }
-    setTimeout(function(){ all_frames_scrolldown(); }, 1000);
-    global_timer = setTimeout(function(){ timer_reload_frames(); }, ms);
 }
 function add_coloricontxt_placeholder(datasets) {
     $("#coloricontxt").empty();
@@ -160,6 +139,8 @@ function fetch_snapshots() {
         dataType: "json"
     }).success(function(data) {
         parse_coloricontxt_dataset(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        fetch_datasets();
     });
 }
 function labelFormatter(label, series) {
@@ -223,6 +204,9 @@ function fetch_ramusage() {
     }).success(function(data) {
         //parse_space_pie("#flot-pie-chartram",data);
         parse_space_bar("ram",data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#ramtxt").empty();
+        $("#rambar").empty();
     });
 }
 function fetch_poolspace() {
@@ -232,6 +216,9 @@ function fetch_poolspace() {
     }).success(function(data) {
         //parse_space_pie("#flot-pie-chartpool",data);
         parse_space_bar("pool",data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#pooltxt").empty();
+        $("#poolbar").empty();
     });
 }
 function fetch_tankspace() {
@@ -241,6 +228,9 @@ function fetch_tankspace() {
     }).success(function(data) {
         //parse_space_pie("#flot-pie-charttank",data);
         parse_space_bar("tank",data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#tanktxt").empty();
+        $("#tankbar").empty();
     });
 }
 function fetch_poolstatus() {
@@ -249,6 +239,8 @@ function fetch_poolstatus() {
         dataType: "text"
     }).success(function(data) {
         $("#zpoolstatuspool").text(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#zpoolstatuspool").text(textStatus+" "+errorThrown);
     });
 }
 function fetch_tankstatus() {
@@ -257,6 +249,8 @@ function fetch_tankstatus() {
         dataType: "text"
     }).success(function(data) {
         $("#zpoolstatustank").text(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#zpoolstatustank").text(textStatus+" "+errorThrown);
     });
 }
 function fetch_logs() {
@@ -265,12 +259,16 @@ function fetch_logs() {
         dataType: "text"
     }).success(function(data) {
         $("#frame1").text(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#frame1").text(textStatus+" "+errorThrown);
     });
     $.ajax({
         url: "./prune.txt",
         dataType: "text"
     }).success(function(data) {
         $("#frame2").text(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#frame2").text(textStatus+" "+errorThrown);
     });
     //-------------------
     $.ajax({
@@ -278,12 +276,16 @@ function fetch_logs() {
         dataType: "text"
     }).success(function(data) {
         $("#frame3").text(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#frame3").text(textStatus+" "+errorThrown);
     });
     $.ajax({
         url: "./prune.0.txt",
         dataType: "text"
     }).success(function(data) {
         $("#frame4").text(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#frame4").text(textStatus+" "+errorThrown);
     });
     //-------------------
     $.ajax({
@@ -291,19 +293,19 @@ function fetch_logs() {
         dataType: "text"
     }).success(function(data) {
         $("#frame5").text(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#frame5").text(textStatus+" "+errorThrown);
     });
     $.ajax({
         url: "./prune.1.txt",
         dataType: "text"
     }).success(function(data) {
         $("#frame6").text(data);
+    }).error(function(XMLHttpRequest, textStatus, errorThrown){
+        $("#frame6").text(textStatus+" "+errorThrown);
     });
 }
 function timer_fetch_snapshots() {
-    var hours = 1;
-    var minutes = hours * 60;
-    var seconds = minutes * 60;
-    var ms = seconds * 1000;
     fetch_snapshots();
     fetch_ramusage();
     fetch_poolspace();
@@ -312,6 +314,13 @@ function timer_fetch_snapshots() {
     fetch_tankstatus();
     fetch_logs();
     global_timer = setTimeout(function(){ timer_fetch_snapshots(); }, ms);
+}
+function timer_reload_frames() {
+    for (var i=0; i<count_frames; i++) {
+        setsrc_frame('#frame'+(i+1));
+    }
+    setTimeout(function(){ all_frames_scrolldown(); }, 1000);
+    global_timer = setTimeout(function(){ timer_reload_frames(); }, ms);
 }
 
 function doc_load() {
