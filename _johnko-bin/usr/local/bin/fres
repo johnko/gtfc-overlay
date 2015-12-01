@@ -262,6 +262,7 @@ if [ "0" = "${MYUID}" ]; then
     test -e /etc/mail/aliases.db || newaliases
     pkg_latest
     pkg_bootstrap
+    pkg-static install -y git
     if ! which git > /dev/null ; then
         pkg_quart
         pkg-static install -y git
