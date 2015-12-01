@@ -5,6 +5,10 @@
     font-family: monospace;
 }
 
+.dataset-box {
+    min-height: 182px;
+}
+
 .footer {
     text-align: right;
 }

@@ -41,14 +41,12 @@ function add_coloricontxt_placeholder(datasets) {
     for (var i=0; i<datasets.length; i++) {
         var newdiv = $("<div>");
         newdiv.attr("id","zfsdataset"+find_replace_tank_urep(datasets[i].name));
+        newdiv.attr("class","dataset-box col-lg-3 col-md-6");
         $("#coloricontxt").append(newdiv);
     }
     default_all_coloricontxt(datasets);
 }
 function set_coloricontxt(selector,color,icon,txt,subtxt) {
-    var col = $("<div>");
-    col.attr("class","col-lg-3 col-md-6");
-
     var panel = $("<div>");
     panel.attr("class","panel panel-" + color);
 
@@ -91,8 +89,7 @@ function set_coloricontxt(selector,color,icon,txt,subtxt) {
     $(heading).empty().append(row);
     $(footer).empty().append(details).append(clrfix);
     $(panel).empty().append(heading).append(footer);
-    $(col).empty().append(panel);
-    $(selector).empty().append(col);
+    $(selector).empty().append(panel);
 }
 function default_all_coloricontxt(datasets) {
     for (var i=0; i<datasets.length; i++) {
