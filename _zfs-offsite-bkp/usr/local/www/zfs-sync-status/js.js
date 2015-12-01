@@ -343,6 +343,9 @@ function timer_fetch_snapshots() {
         setsrc_frame('#frame'+(i+1));
     }
     setTimeout(function(){ all_frames_scrolldown(); }, 1000);
+    try {
+        clearInterval(global_timer);
+    } catch(e) {}
     global_timer = setInterval(function(){ timer_reload_frames(); }, get_refresh_time());
 }*/
 
