@@ -26,3 +26,7 @@
 .nowrap {
     white-space: nowrap;
 }
+
+.shortinput {
+    width: 50px;
+}

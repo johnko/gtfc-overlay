@@ -1,11 +1,20 @@
 var global_timer;
-var hours = 1;
-var minutes = hours * 60;
-var seconds = minutes * 60;
-var ms = seconds * 1000;
 // Log files
 var count_frames = 6;
 
+function get_refresh_time() {
+    var hours = 0.5;
+    var minutes = hours * 60;
+    var seconds = minutes * 60;
+    var data = $("#refresh_time_seconds").val();
+    if ( parseInt(data, 10) ) {
+        if ( parseInt(data, 10) > 0 ) {
+            seconds = data;
+        }
+    }
+    var ms = seconds * 1000;
+    return ms;
+}
 function find_replace_tank_urep(str) {
     var res = str.replace("tank/urep/","");
     return res;
@@ -15,13 +24,13 @@ function scrolldown_frame(selector) {
     //contents.scrollTop(contents.height());
     $(selector).scrollTop($(selector)[0].scrollHeight);
 }
-function setsrc_frame(selector) {
+/*function setsrc_frame(selector) {
     var src = $(selector).attr("src");
     $(selector).attr(
         "src",
         src
     );
-}
+}*/
 function all_frames_scrolldown() {
     for (var i=0; i<count_frames; i++) {
         scrolldown_frame('#frame'+(i+1));
@@ -170,6 +179,22 @@ function parse_space_pie(selector, data) {
         tooltip: false
     });
 }
+function create_progressbar(width,color) {
+    var pbar = $("<div>");
+    pbar.attr("class","progress-bar progress-bar-"+color);
+    pbar.attr("role","progressbar");
+    pbar.attr("aria-valuenow",width);
+    pbar.attr("aria-valuemin",0);
+    pbar.attr("aria-valuemax",100);
+    pbar.attr("style","width: "+width+"%");
+
+    var screenreader = $("<span>");
+    screenreader.attr("class","sr-only");
+    screenreader.text(width+"%");
+
+    $(pbar).empty().append(screenreader);
+    return pbar;
+}
 function parse_space_bar(prefix, data) {
     var used = "?";
     var color = "info";
@@ -182,19 +207,13 @@ function parse_space_bar(prefix, data) {
     if (used >= 50) { color = "warning"; }
     if (used >= 80) { color = "danger"; }
     $("#"+prefix+"txt").text(used+"%");
-    var pbar = $("<div>");
-    pbar.attr("class","progress-bar progress-bar-"+color);
-    pbar.attr("role","progressbar");
-    pbar.attr("aria-valuenow",used);
-    pbar.attr("aria-valuemin",0);
-    pbar.attr("aria-valuemax",100);
-    pbar.attr("style","width: "+used+"%");
-
-    var screenreader = $("<span>");
-    screenreader.attr("class","sr-only");
-    screenreader.text(used+"%");
-
-    $(pbar).empty().append(screenreader);
+    var pbar = create_progressbar(used, color);
+    $("#"+prefix+"bar").empty().append(pbar);
+}
+function error_bar(prefix, txt) {
+    var color = "danger";
+    $("#"+prefix+"txt").text(txt);
+    var pbar = create_progressbar(100, "danger");
     $("#"+prefix+"bar").empty().append(pbar);
 }
 function fetch_ramusage() {
@@ -205,8 +224,7 @@ function fetch_ramusage() {
         //parse_space_pie("#flot-pie-chartram",data);
         parse_space_bar("ram",data);
     }).error(function(XMLHttpRequest, textStatus, errorThrown){
-        $("#ramtxt").empty();
-        $("#rambar").empty();
+        error_bar("ram",x);
     });
 }
 function fetch_poolspace() {
@@ -217,8 +235,7 @@ function fetch_poolspace() {
         //parse_space_pie("#flot-pie-chartpool",data);
         parse_space_bar("pool",data);
     }).error(function(XMLHttpRequest, textStatus, errorThrown){
-        $("#pooltxt").empty();
-        $("#poolbar").empty();
+        error_bar("pool",x);
     });
 }
 function fetch_tankspace() {
@@ -229,8 +246,7 @@ function fetch_tankspace() {
         //parse_space_pie("#flot-pie-charttank",data);
         parse_space_bar("tank",data);
     }).error(function(XMLHttpRequest, textStatus, errorThrown){
-        $("#tanktxt").empty();
-        $("#tankbar").empty();
+        error_bar("tank", "error");
     });
 }
 function fetch_poolstatus() {
@@ -305,7 +321,7 @@ function fetch_logs() {
         $("#frame6").text(textStatus+" "+errorThrown);
     });
 }
-function timer_fetch_snapshots() {
+function fetch_all(){
     fetch_snapshots();
     fetch_ramusage();
     fetch_poolspace();
@@ -313,26 +329,31 @@ function timer_fetch_snapshots() {
     fetch_tankspace();
     fetch_tankstatus();
     fetch_logs();
-    global_timer = setTimeout(function(){ timer_fetch_snapshots(); }, ms);
+    setTimeout(function(){ all_frames_scrolldown(); }, 1000);
 }
-function timer_reload_frames() {
+function timer_fetch_snapshots() {
+    fetch_all();
+    try {
+        clearInterval(global_timer);
+    } catch(e) {}
+    global_timer = setInterval(function(){ fetch_all(); }, get_refresh_time());
+}
+/*function timer_reload_frames() {
     for (var i=0; i<count_frames; i++) {
         setsrc_frame('#frame'+(i+1));
     }
     setTimeout(function(){ all_frames_scrolldown(); }, 1000);
-    global_timer = setTimeout(function(){ timer_reload_frames(); }, ms);
-}
+    global_timer = setInterval(function(){ timer_reload_frames(); }, get_refresh_time());
+}*/
 
 function doc_load() {
-
     // setup placeholders
     fetch_datasets();
-
     // start timer to fetch logs
-    timer_reload_frames();
-
+    //timer_reload_frames();
     // start timer to fetch real data
     timer_fetch_snapshots();
 }
 $(document).ready(function(){ doc_load(); });
 //$(window).on('load', function(){ doc_load(); });
+$("#refresh_time_seconds").on('keyup', function(){ doc_load(); });
