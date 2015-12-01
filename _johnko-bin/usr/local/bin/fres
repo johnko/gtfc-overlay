@@ -214,6 +214,11 @@ pkg_latest() {
     fi
 }
 
+pkg_install_git() {
+    pkg-static update -f
+    pkg-static install -y git
+}
+
 ######################################################################
 # Main
 ######################################################################
@@ -262,18 +267,22 @@ if [ "0" = "${MYUID}" ]; then
     test -e /etc/mail/aliases.db || newaliases
     pkg_latest
     pkg_bootstrap
-    pkg-static install -y git
+    if ! which git > /dev/null ; then
+        pkg_install_git
+    fi
     if ! which git > /dev/null ; then
         pkg_quart
-        pkg-static install -y git
+        pkg_install_git
     fi
-fi
-
-if ! which git > /dev/null ; then
-    # Try unsetting PROXY and pkg update -f then reset proxy
     noproxy
-    pkg-static update -f
-    pkg-static install -y git
+    if ! which git > /dev/null ; then
+        pkg_latest
+        pkg_install_git
+    fi
+    if ! which git > /dev/null ; then
+        pkg_quart
+        pkg_install_git
+    fi
     if ! which git > /dev/null ; then
         # Just quit
         echo "ERROR: git not found"
