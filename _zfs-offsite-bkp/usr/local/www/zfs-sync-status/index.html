@@ -67,33 +67,36 @@
                         <li>
                             <a href="#">
                                 <div>
-                                    <p class="text-center">
+                                    <p>
                                         <i class="pull-left fa fa-flash fa-fw"></i> RAM
-                                        <span class="pull-right" id="ramtxt"></span>
+                                        <span class="huge pull-right" id="ramtxt"></span>
+                                        <div class="clearboth"></div>
                                     </p>
-                                    <div class="progress progress-striped" id="rambar"></div>
+                                    <div class="progress progress-striped progress-outline" id="rambar"></div>
                                 </div>
                             </a>
                         </li>
                         <li>
-                            <a href="#">
+                            <a href="#pool">
                                 <div>
-                                    <p class="text-center">
+                                    <p>
                                         <i class="pull-left fa fa-rocket fa-fw"></i> OS
-                                        <span class="pull-right" id="pooltxt"></span>
+                                        <span class="huge pull-right" id="pooltxt"></span>
+                                        <div class="clearboth"></div>
                                     </p>
-                                    <div class="progress progress-striped" id="poolbar"></div>
+                                    <div class="progress progress-striped progress-outline" id="poolbar"></div>
                                 </div>
                             </a>
                         </li>
                         <li>
-                            <a href="#">
+                            <a href="#tank">
                                 <div>
-                                    <p class="text-center">
+                                    <p>
                                         <i class="pull-left fa fa-database fa-fw"></i> Data
-                                        <span class="pull-right" id="tanktxt"></span>
+                                        <span class="huge pull-right" id="tanktxt"></span>
+                                        <div class="clearboth"></div>
                                     </p>
-                                    <div class="progress progress-striped" id="tankbar"></div>
+                                    <div class="progress progress-striped progress-outline" id="tankbar"></div>
                                 </div>
                             </a>
                         </li>
@@ -112,7 +115,7 @@
                 <div class="col-lg-12">
                     <p id="dashboard"></p>
                     <!-- date -u +%y%m%d-%H%M%S -->
-                    <p>Snapshot timestamps are in UTC in the format YearMonthDay-HourMinuteSecond.</p>
+                    <p>Refreshes every 1 or 2 hours. Snapshot names are timestamps in UTC in the format YearMonthDay-HourMinuteSecond.</p>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -120,7 +123,7 @@
             <div class="row" id="coloricontxt"></div>
             <!-- /.row -->
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-6" id="pool">
                     <div class="panel panel-default">
                         <div class="panel-heading text-center">
                             <i class="pull-left fa fa-hdd-o fa-fw"></i> Operating System ZFS Pool
@@ -136,7 +139,7 @@
                     <!-- /.panel -->
                 </div>
                 <!-- /.col-lg-6 -->
-                <div class="col-lg-6">
+                <div class="col-lg-6" id="tank">
                     <div class="panel panel-default">
                         <div class="panel-heading text-center">
                             <i class="pull-left fa fa-hdd-o fa-fw"></i> Data ZFS Pool

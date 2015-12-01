@@ -90,10 +90,11 @@ function set_coloricontxt(selector,color,icon,txt,subtxt) {
     coltxt.attr("class","col-xs-9 text-right");
 
     var hugetxt = $("<div>");
-    hugetxt.attr("class","huge");
+    hugetxt.attr("class","huge pull-right");
     hugetxt.text(subtxt.replace("local:","").replace(/-.*/,"").replace("loading...",""));
 
     var divtxt = $("<div>");
+    divtxt.attr("class","nowrap pull-right clearboth");
     divtxt.text(txt);
 
     $(colico).empty().append(ico);
@@ -136,7 +137,11 @@ function parse_coloricontxt_dataset(datasets) {
             color = "red";
             icon = "times";
         }
-        set_coloricontxt('#zfsdataset'+find_replace_tank_urep(datasets[i].name), color, icon, find_replace_tank_urep(datasets[i].name), "local:"+datasets[i].local+"<br/>remote:"+datasets[i].remote);
+        var txt = "local:"+datasets[i].local+"<br/>remote:"+datasets[i].remote;
+        if (datasets[i].local == datasets[i].remote) {
+            txt = datasets[i].local;
+        }
+        set_coloricontxt('#zfsdataset'+find_replace_tank_urep(datasets[i].name), color, icon, find_replace_tank_urep(datasets[i].name), txt);
     }
 }
 function fetch_datasets() {

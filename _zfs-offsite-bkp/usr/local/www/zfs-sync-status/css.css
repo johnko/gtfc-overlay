@@ -1,5 +1,5 @@
 .logfile {
-    max-height: 200px;
+    max-height: 400px;
     white-space: pre;
     overflow: auto;
     font-family: monospace;
@@ -12,4 +12,17 @@
 .preauto {
     white-space: pre;
     overflow: auto;
+}
+
+.clearboth {
+    clear: both;
+}
+
+.progress-outline {
+    border-width: 1px;
+    border-style: solid;
+}
+
+.nowrap {
+    white-space: nowrap;
 }
