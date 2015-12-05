@@ -48,7 +48,7 @@ EOF
             if [ "x0" = "x${ipalias}" ]; then
                 ipalias="($HOSTNIC)"
             fi
-            #echo "debug: ${name} ${ipalias} ${pubport} ${realport}"
+            #echo "debug: ${name} ${ipalias} ${pubport} ${realport} ${doucarp}"
             if [ "x0" != "x${ipalias}" ] && [ "x" != "x${ipalias}" ] \
             && [ "x" != "x${name}" ] && [ "x" != "x${pubport}" ] \
             && [ "x" != "x${realport}" ] && [ "x" != "x${doucarp}" ] \
