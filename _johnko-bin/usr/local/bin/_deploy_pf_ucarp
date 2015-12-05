@@ -45,10 +45,10 @@ EOF
         cat /usr/local/etc/deploypfucarp.conf.d/* \
         | while read name ipalias pubport realport doucarp ; do
             case "$name" in "#"*|"") continue; esac
-            if [ "x0" != "x${ipalias}" ]; then
+            if [ "x0" = "x${ipalias}" ]; then
                 ipalias=$HOSTIP
             fi
-            #echo "debug ${name} ${ipalias} ${pubport} ${realport}"
+            #echo "debug: ${name} ${ipalias} ${pubport} ${realport}"
             if [ "x0" != "x${ipalias}" ] && [ "x" != "x${ipalias}" ] \
             && [ "x" != "x${name}" ] && [ "x" != "x${pubport}" ] \
             && [ "x" != "x${realport}" ] && [ "x" != "x${doucarp}" ] \
