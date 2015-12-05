@@ -63,7 +63,7 @@ EOF
 rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${ipalias} port = ${pubport} -> ${IPNET}`jailip ${name}` port ${realport}
 EOF
                 fi
-                if [ "xu" == "x${doucarp}" ]; then
+                if [ "$HOSTIP" != "$ipalias" ] && [ "xu" == "x${doucarp}" ]; then
                     if [ ! -e /usr/local/etc/rc.d/ucarp${name} ]; then
                         cat /usr/local/etc/rc.d/ucarp \
                         | sed "s;ucarp;ucarp${name};g" >/usr/local/etc/rc.d/ucarp${name}
