@@ -82,6 +82,9 @@ case ${name} in
     horde)
         iocage set allow_sysvipc=1 ${name}
     ;;
+    zfssyncstatus)
+        install -d /usr/local/www/data
+    ;;
 esac
 
 iocage start ${name}
@@ -94,5 +97,14 @@ case ${name} in
     ;;
     owncloud)
         rsync -qalmP $( ioc-pathof ${name} )/root/local/owncloud/ /root/local/owncloud/
+    ;;
+    zfssyncstatus)
+        fstab=/iocage/tags/zfssyncstatus/fstab
+        if [ -e $fstab ]; then
+            cat >$fstab <<EOF
+/usr/local/www/data    /iocage/tags/zfssyncstatus/root/usr/local/www/data    nullfs    ro    0    0
+/var/log    /iocage/tags/zfssyncstatus/root/var/hostlog    nullfs    ro    0    0
+EOF
+        fi
     ;;
 esac

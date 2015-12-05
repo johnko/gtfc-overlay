@@ -24,6 +24,7 @@ find /usr/local/www/zfssyncstatus -exec chown root:wheel {} \;
 find /usr/local/www/zfssyncstatus -type d -exec chmod 755 {} \;
 find /usr/local/www/zfssyncstatus -type f -exec chmod 644 {} \;
 
-
+install -d /usr/local/www/data
+install -d /var/hostlog
 
 service nginx start
