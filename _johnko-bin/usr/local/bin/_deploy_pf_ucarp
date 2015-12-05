@@ -38,7 +38,7 @@ fi
 setuppf() {
     local name
     cat >/etc/pf/jails.anchor <<EOF
-    nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any -> ${HOSTIP}
+    nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any -> (self)
 EOF
 
     if ls /usr/local/etc/deploypfucarp.conf.d/* >/dev/null 2>&1 ; then
@@ -46,7 +46,7 @@ EOF
         | while read name ipalias pubport realport doucarp ; do
             case "$name" in "#"*|"") continue; esac
             if [ "x0" = "x${ipalias}" ]; then
-                ipalias=$HOSTIP
+                ipalias="(self)"
             fi
             #echo "debug: ${name} ${ipalias} ${pubport} ${realport}"
             if [ "x0" != "x${ipalias}" ] && [ "x" != "x${ipalias}" ] \
