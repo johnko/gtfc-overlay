@@ -59,7 +59,7 @@ EOF
 rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${ipalias} port = ${pubport} -> ${IPNET}`jailip ${name}` port ${realport}
 EOF
                 fi
-                if [ "$HOSTIP" != "$ipalias" ] && [ "xu" == "x${doucarp}" ]; then
+                if [ "$HOSTIP" != "$ipalias" ] && [ "(self)" != "$ipalias" ] && [ "xu" == "x${doucarp}" ]; then
                     # primary ip allow service
                     if  ! pf-anchor show jails | grep "rdr pass on ${HOSTNIC} inet proto { tcp, udp } from any to ${HOSTIP} port = ${pubport} " >/dev/null ; then
                         cat >>/etc/pf/jails.anchor <<EOF
