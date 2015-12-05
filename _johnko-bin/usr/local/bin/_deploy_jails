@@ -66,10 +66,13 @@ fi
 setupnginxconfig() {
     local name=${1}
     local FQDN=${2}
-    cat ~/git/deploy/usr/local/etc/nginx/sites-available/nginx-all \
-        | sed "s/localhost.localdomain/${FQDN}/" \
-        >$( ioc-pathof ${name} )/usr/local/etc/nginx/sites-enabled/${name}
-    chmod 644 $( ioc-pathof ${name} )/usr/local/etc/nginx/sites-enabled/${name}
+    local path=$( ioc-pathof ${name} )/usr/local/etc/nginx/sites-enabled/${name}
+    if [ ! -e $path ]; then
+        cat ~/git/deploy/usr/local/etc/nginx/sites-available/nginx-all \
+            | sed "s/localhost.localdomain/${FQDN}/" \
+            >$path
+    fi
+    chmod 644 $path
 }
 
 case ${1} in
