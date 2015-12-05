@@ -94,6 +94,8 @@
 
 /usr/home/_sshtunl/bin                                         _sshtunl  _sshtunl  700
 /usr/home/_sshtunl/bin/ssh-tunnel-1                            _sshtunl  _sshtunl  700
+/usr/home/_sshtunl/bin/ssh-tunnel-2                            _sshtunl  _sshtunl  700
+/usr/home/_sshtunl/bin/ssh-tunnel-3                            _sshtunl  _sshtunl  700
 /usr/home/_sshtunl/bin/ssh-tunnel-all                          _sshtunl  _sshtunl  700
 /usr/home/_sshtunl/bin/ssh-tunnel-include                      _sshtunl  _sshtunl  700
 
@@ -384,51 +386,8 @@
 
 /usr/local/etc/mdnsresponder.conf                              root      wheel     644
 
-/usr/local/etc/nginx                                           root      wheel     755
-
-/usr/local/etc/nginx/sites-enabled                             root      wheel     755
-/usr/local/etc/nginx/sites-enabled/zfs-offsite-bkp             root      wheel     644
-
 /usr/local/www                                                 root      wheel     755
 
 /usr/local/www/data                                            urep      urep      755
 /usr/local/www/data/.gitignore                                 urep      urep      644
 /usr/local/www/data/json-datasets.js                           urep      urep      644
-/usr/local/www/data/json-poolspace.js                          urep      urep      644
-/usr/local/www/data/json-ramusage.js                           urep      urep      644
-/usr/local/www/data/json-snapshots.js                          urep      urep      644
-/usr/local/www/data/json-tankspace.js                          urep      urep      644
-
-/usr/local/www/zfs-sync-status                                 root      wheel     755
-/usr/local/www/zfs-sync-status/LICENSE                         root      wheel     644
-/usr/local/www/zfs-sync-status/bootstrap.css                   root      wheel     644
-/usr/local/www/zfs-sync-status/bootstrap.css.map               root      wheel     644
-/usr/local/www/zfs-sync-status/bootstrap.js                    root      wheel     644
-/usr/local/www/zfs-sync-status/css.css                         root      wheel     644
-/usr/local/www/zfs-sync-status/excanvas.js                     root      wheel     644
-/usr/local/www/zfs-sync-status/font-awesome.css                root      wheel     644
-/usr/local/www/zfs-sync-status/fonts                           root      wheel     755
-/usr/local/www/zfs-sync-status/fonts/FontAwesome.otf           root      wheel     644
-/usr/local/www/zfs-sync-status/fonts/fontawesome-webfont.eot   root      wheel     644
-/usr/local/www/zfs-sync-status/fonts/fontawesome-webfont.svg   root      wheel     644
-/usr/local/www/zfs-sync-status/fonts/fontawesome-webfont.ttf   root      wheel     644
-/usr/local/www/zfs-sync-status/fonts/fontawesome-webfont.woff  root      wheel     644
-/usr/local/www/zfs-sync-status/index.html                      root      wheel     644
-/usr/local/www/zfs-sync-status/index0.html                     root      wheel     644
-/usr/local/www/zfs-sync-status/index1.html                     root      wheel     644
-/usr/local/www/zfs-sync-status/jquery.flot.js                  root      wheel     644
-/usr/local/www/zfs-sync-status/jquery.flot.pie.js              root      wheel     644
-/usr/local/www/zfs-sync-status/jquery.flot.resize.js           root      wheel     644
-/usr/local/www/zfs-sync-status/jquery.flot.time.js             root      wheel     644
-/usr/local/www/zfs-sync-status/jquery.flot.tooltip.js          root      wheel     644
-/usr/local/www/zfs-sync-status/jquery.js                       root      wheel     644
-/usr/local/www/zfs-sync-status/js.js                           root      wheel     644
-/usr/local/www/zfs-sync-status/metisMenu.css                   root      wheel     644
-/usr/local/www/zfs-sync-status/metisMenu.js                    root      wheel     644
-/usr/local/www/zfs-sync-status/morris-data.js                  root      wheel     644
-/usr/local/www/zfs-sync-status/morris.css                      root      wheel     644
-/usr/local/www/zfs-sync-status/morris.js                       root      wheel     644
-/usr/local/www/zfs-sync-status/raphael.js                      root      wheel     644
-/usr/local/www/zfs-sync-status/sb-admin-2.css                  root      wheel     644
-/usr/local/www/zfs-sync-status/sb-admin-2.js                   root      wheel     644
-/usr/local/www/zfs-sync-status/timeline.css                    root      wheel     644
