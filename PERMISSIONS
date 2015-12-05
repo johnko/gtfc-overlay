@@ -100,7 +100,7 @@
 /usr/home/_sshtunl/crontabbed                                  _sshtunl  _sshtunl  700
 /usr/home/_sshtunl/crontabbed/0_PATH                           _sshtunl  _sshtunl  600
 /usr/home/_sshtunl/crontabbed/0_SHELL                          _sshtunl  _sshtunl  600
-/usr/home/_sshtunl/crontabbed/every1m-ssh-tunnel-all           _sshtunl  _sshtunl  600
+/usr/home/_sshtunl/crontabbed/ssh-tunnel-all                   _sshtunl  _sshtunl  600
 
 /usr/home/urep                                                 urep      urep      700
 
@@ -115,9 +115,9 @@
 /usr/home/urep/crontabbed                                      urep      urep      700
 /usr/home/urep/crontabbed/0_PATH                               urep      urep      600
 /usr/home/urep/crontabbed/0_SHELL                              urep      urep      600
-/usr/home/urep/crontabbed/daily-zsnaprune-all                  urep      urep      600
-/usr/home/urep/crontabbed/every1h-stat-json-urep               urep      urep      600
-/usr/home/urep/crontabbed/every2h-zfs-sync-xz-pull-all         urep      urep      600
+/usr/home/urep/crontabbed/stat-json-urep                       urep      urep      600
+/usr/home/urep/crontabbed/zfs-sync-xz-pull-all                 urep      urep      600
+/usr/home/urep/crontabbed/zsnaprune-all                        urep      urep      600
 
 /usr/local                                                     root      wheel     755
 
@@ -190,6 +190,7 @@
 /usr/local/bin/deploy_vnc                                      root      wheel     755
 /usr/local/bin/deploy_xfce4lumina                              root      wheel     755
 /usr/local/bin/deploy_zabbix                                   root      wheel     755
+/usr/local/bin/deploy_zfssyncstatus                            root      wheel     755
 /usr/local/bin/disable-ucarp                                   root      wheel     755
 /usr/local/bin/dlna-link-mp3-to-music                          root      wheel     755
 /usr/local/bin/dlna-permissions                                root      wheel     755
