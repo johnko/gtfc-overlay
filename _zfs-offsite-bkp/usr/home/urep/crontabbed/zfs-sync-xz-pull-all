@@ -1,0 +1,1 @@
+1 * * * * zfs-sync-xz-pull-all >>/var/log/zfs-sync-xz-pull-all.log 2>&1
