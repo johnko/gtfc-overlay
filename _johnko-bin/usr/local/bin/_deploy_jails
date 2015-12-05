@@ -99,6 +99,7 @@ if ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 ; then
                                                 env IP=${IPNET}${num}  _deploy_app ${name} ${boot}
                         setupnginxconfig ${name} ${FQDN}
                         ;;
+                    zfssyncstatus)              env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                     squid)                      env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                     easydnsclient)              env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
                     couchdb)                    env IP=${IPNET}${num}  _deploy_app ${name} ${boot} ;;
