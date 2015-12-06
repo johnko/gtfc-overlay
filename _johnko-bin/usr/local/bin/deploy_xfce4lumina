@@ -2,7 +2,7 @@
 
 # READY
 
-pkg install -y x11/xorg x11-wm/xfce4-wm \
+pkg install -y x11/xorg xfce x11-wm/xfce4-wm \
 Thunar xfce4-tumbler \
 lumina \
 hal \
@@ -14,14 +14,21 @@ if [ ! -e /usr/local/bin/xfwm4 ]; then
     exit 1
 fi
 
+XSESSION=${HOME}/.xsession
+if [ ! -f $XSESSION ]; then
+    cat > $XSESSION <<EOF
+#!/bin/sh
+exec /usr/local/bin/startxfce4
+EOF
+    chmod +x $XSESSION
+fi
+
 XINITRC=${HOME}/.xinitrc
 if [ ! -f $XINITRC ]; then
     cat > $XINITRC <<EOF
 #!/bin/sh
 xrdb \$HOME/.Xresources &
-xfwm4 &
-xfce4-panel &
-xterm -bg black -fg gray &
+exec /usr/local/bin/startxfce4
 EOF
     chmod +x $XINITRC
 fi
