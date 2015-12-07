@@ -46,7 +46,7 @@
 /etc/sysctl.conf                                               root      wheel     644
 /etc/syslog.conf                                               root      wheel     644
 
-/root                                                          root      wheel     750
+/root                                                          root      wheel     755
 
 /root/.ssh                                                     root      wheel     700
 /root/.ssh/authorized_keys                                     root      wheel     600
