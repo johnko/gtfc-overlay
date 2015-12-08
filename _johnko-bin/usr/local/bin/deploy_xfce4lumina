@@ -1,15 +1,34 @@
 #!/bin/sh
 
 # READY
+# Turns a base FreeBSD install into a Desktop w/ GUI
 
-pkg install -y x11/xorg xfce x11-wm/xfce4-wm \
-Thunar xfce4-tumbler \
-lumina \
-hal \
-thunderbird \
-firefox
+pkg install -y \
+x11/xorg \
+x11-wm/xfce4 x11-wm/xfce4-wm \
+x11-fm/thunar deskutils/xfce4-tumbler \
+x11/lumina \
+sysutils/hal \
+editors/kate \
+textproc/kompare \
+security/keepassx2 \
+ftp/filezilla \
+editors/libreoffice \
+finance/gnucash \
+finance/skrooge \
+graphics/inkscape \
+graphics/gimp \
+graphics/shotwell \
+net/krdc \
+net/freerdp \
+www/choqok \
+editors/calligra \
+deskutils/kdepim4 \
+audio/mumble \
+www/chromium \
+www/firefox
 
-if [ ! -e /usr/local/bin/xfwm4 ]; then
+if [ ! -e /usr/local/bin/startxfce4 ]; then
     echo "ERROR: install failed"
     exit 1
 fi
@@ -38,3 +57,25 @@ sysrc -f /etc/rc.conf.d/hald hald_enable="YES"
 
 service dbus start
 service hald start
+
+cat <<EOF
+
+Copy /root/.xinitrc to the user's ~/.xinitrc
+
+Then login as user and:
+    startx
+
+You may also want to add to the user's home ~/.kde4/share/config/kdeglobals
+
+[Locale]
+Country=C
+Language=en_US
+PositiveSign=
+TimeFormat=%H:%M:%S
+WeekStartDay=7
+
+EOF
+
+# https://answers.launchpad.net/ubuntu/+source/kdepim/+question/7225
+
+# xfreerdp is like mstsc, eg: xfreerdp /v:target_ip
