@@ -209,6 +209,7 @@
 /usr/local/bin/fzg-fstab-swapon                                root      wheel     755
 /usr/local/bin/fzg-no-geli                                     root      wheel     755
 /usr/local/bin/fzg-random-key                                  root      wheel     755
+/usr/local/bin/fzg-rotate                                      root      wheel     755
 /usr/local/bin/fzg-unlock-on-boot                              root      wheel     755
 /usr/local/bin/fzg-wipe                                        root      wheel     755
 /usr/local/bin/gdf                                             root      wheel     755
