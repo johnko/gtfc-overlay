@@ -1,74 +1,71 @@
 #!/bin/sh
 
-# remove ada0, reinstall on ada0
-# add ada1 to ada0 mirror
+set -x
 
-POOL=$1
-NEWHOSTNAME=$2
-DISK=$3
-DISKTWO=$4
+DISK=$1
 
-if [ "x" = "x$POOL" ]; then
-    cat <<EOF
-Usage:
-    $( basename $0 ) pool newhostname $( kenv fzg_i_disks ) ada1
-EOF
+if [ "x" = "x$DISK" ]; then
+    echo "Usage: $0 adaX"
+    exit 1
+fi
+if [ ! -e /dev/${DISK} ]; then
+    echo "Usage: $0 adaX"
     exit 1
 fi
 
-
-
-if [ "x-" != "x$POOL" -a "x-" != "x$NEWHOSTNAME" ]; then
-    for devid in ${DISK}p1 ${DISK}p2 ${DISK}p3 ${DISK}p4 ${DISK}p5 ${DISK}p6 \
-        $( glabel status -s | grep ${DISK}p | awk '{print $1}' ) ; do
-        while [ -e /dev/${devid}.eli ]; do
-            zpool detach $POOL ${devid}.eli >/dev/null 2>&1
-            zpool detach tank  ${devid}.eli >/dev/null 2>&1
-            zpool detach vault ${devid}.eli >/dev/null 2>&1
-            swapoff /dev/${devid}.eli >/dev/null 2>&1
-            geli detach ${devid}.eli >/dev/null 2>&1
-        done
-        zpool detach boot$POOL ${devid} >/dev/null 2>&1
-        zpool detach $POOL ${devid} >/dev/null 2>&1
-        zpool detach tank  ${devid} >/dev/null 2>&1
-        zpool detach vault ${devid} >/dev/null 2>&1
-        swapoff /dev/${devid} >/dev/null 2>&1
-    done
-    gpart destroy -F ${DISK}
-    if [ "pool" = "$POOL" ]; then
-        fzg -d ${DISK} -z 5g -n -H $NEWHOSTNAME -p usb
-    elif [ "usb" = "$POOL" ]; then
-        fzg -d ${DISK} -z 5g -n -H $NEWHOSTNAME
+do_fzg_rotate() {
+    if [ "ada0" = "$DISK" ]; then
+        fzg-rotate - - ada1 $DISK
+    else
+        fzg-rotate - - ada0 $DISK
     fi
-    fzg-copy-network-conf-to-mnt
-    cat <<EOF
-Please reboot then run:
-    `basename $0` - - ${DISK} ${DISKTWO}
-EOF
+}
+
+do_desktop_fzg_rotate() {
+    if [ "ada0" = "$DISK" ]; then
+        fzg -e ada1 -z 20g -G -d ${DISK} -p pool
+    else
+        fzg -e ada0 -z 20g -G -d ${DISK} -p pool
+    fi
+}
+
+do_detach(){
+    if zpool list bootpool >/dev/null 2>&1 ; then
+        zpool detach bootpool ${DISK}p2
+        swapoff /dev/${DISK}p3.eli
+        zpool detach pool ${DISK}p4.eli
+        geli detach ${DISK}p4
+    else
+        swapoff /dev/${DISK}p2.eli
+        zpool detach pool ${DISK}p3
+    fi
+}
+
+
+pv /dev/urandom | dd of=/dev/$DISK bs=1m count=120000
+onetb=953800
+twotb=$( echo "$onetb * 2" | bc )
+threetb=$( echo "$onetb * 3" | bc )
+fourtb=$( echo "$onetb * 4" | bc )
+pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$fourtb \
+|| pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$threetb \
+|| pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$twotb \
+|| pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$onetb
+
+if zpool list bootpool >/dev/null 2>&1 ; then
+    # desktop
+    do_desktop_fzg_rotate
+    echo "When zpool status shows resilver is complete, press ENTER:"
+    read
+    do_detach
+    pv /dev/urandom | dd of=/dev/${DISK}p4 bs=1m
+    do_desktop_fzg_rotate
 else
-    gpart destroy -F ${DISKTWO}
-    if zpool status usb >/dev/null 2>/dev/null ; then
-        fzg -e ${DISK} -z 5g -d ${DISKTWO} -p usb
-    elif zpool status pool >/dev/null 2>/dev/null ; then
-        fzg -e ${DISK} -z 5g -d ${DISKTWO} -p pool
-    fi
-    fzg-fstab-swapon ${DISKTWO}
-    if [ ! -e ~/local/cshvars ] && [ -e ~/perm/cshvars ]; then
-        install -C -m 600 ~/perm/cshvars ~/local/cshvars
-    fi
-#    fzg-random-key
-#        fzg-unlock-on-boot
-#    or
-#        fzg-no-geli tank
-#    sortconf -f
-#    vi /boot/loader.conf.local
-    cat <<EOF
-A reminder to run these commands to setup tank/iocage:
-    fzg -i -t 1 -p key -d da0
-    zfs set copies=3 key
-    keypkg-setup -t 4 -p tank -r mirror -d ada0 -d ada1 -d ada2
-    ioc-setup
-Or create and allow tank/urep with:
-    zfs-allow-urep
-EOF
+    # server
+    do_fzg_rotate
+    echo "When zpool status shows resilver is complete, press ENTER:"
+    read
+    do_detach
+    pv /dev/urandom | dd of=/dev/${DISK}p3 bs=1m
+    do_fzg_rotate
 fi
