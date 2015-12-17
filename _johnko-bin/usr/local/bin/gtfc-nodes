@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Usage:
-# gtfc-nodes
-
-cat ${LOCALFOLDER}/.gitcluster.ssh/nodes | grep -v "`whoami`@`hostname`:22 ${LOCALFOLDER}"

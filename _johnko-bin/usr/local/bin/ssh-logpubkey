@@ -1,6 +1,0 @@
-#!/bin/sh
-
-grep Accepted /var/log/auth* \
-  | awk '{$1=$2=$3=$4=$5=$12=$13="";print }' \
-	| sort \
-	| uniq -c

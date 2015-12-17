@@ -1,3 +1,0 @@
-#!/bin/sh
-
-ssh-keygen -N '' -t rsa -b 4096 -f $HOME/.ssh/id_rsa

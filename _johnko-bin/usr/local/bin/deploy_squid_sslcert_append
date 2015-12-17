@@ -1,8 +1,0 @@
-#!/bin/sh
-
-if [ -e /root/local/squidca.crt  ]; then
-    if [ ! -e /root/local/ca-root-nss.crt.orig ]; then
-        cat /usr/local/share/certs/ca-root-nss.crt > /root/local/ca-root-nss.crt.orig
-    fi
-    cat /root/local/squidca.crt >> /usr/local/share/certs/ca-root-nss.crt
-fi

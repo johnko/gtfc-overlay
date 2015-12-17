@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Display zpool in a table
-
-zpool list $*

@@ -1,4 +1,0 @@
-#!/bin/sh
-
-ssh-keygen -G /etc/ssh/moduli.tmp -b 4096
-ssh-keygen -T /etc/ssh/moduli -f /etc/ssh/moduli.tmp

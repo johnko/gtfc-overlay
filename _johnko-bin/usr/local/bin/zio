@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Display zpool i/o
-
-zpool iostat $*

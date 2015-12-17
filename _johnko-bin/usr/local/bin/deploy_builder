@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# READY
-
-deploy_buildersquidpkg
-deploy_builderffmpegpkg
-# deploy_buildergitlabpkg

@@ -1,5 +1,0 @@
-#!/bin/sh
-
-uptime \
-| egrep -o "up[^,]*" \
-| sed 's;up  *;;'

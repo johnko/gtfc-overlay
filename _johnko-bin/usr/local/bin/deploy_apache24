@@ -1,9 +1,0 @@
-#!/bin/sh
-
-pkg install -y apache24
-
-apache-config-freebsd
-
-sysrc apache24_enable="YES"
-
-service apache24 start
