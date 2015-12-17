@@ -41,31 +41,42 @@ do_detach(){
     fi
 }
 
-
-pv /dev/urandom | dd of=/dev/$DISK bs=1m count=120000
+do_detach
+pv /dev/urandom | dd of=/dev/$DISK bs=1m count=12000
 onetb=953800
 twotb=$( echo "$onetb * 2" | bc )
 threetb=$( echo "$onetb * 3" | bc )
 fourtb=$( echo "$onetb * 4" | bc )
-pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$fourtb \
-|| pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$threetb \
-|| pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$twotb \
-|| pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$onetb
+pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$fourtb count=6000
+pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$threetb count=6000
+pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$twotb count=6000
+pv /dev/urandom | dd of=/dev/$DISK bs=1m seek=$onetb count=6000
 
 if zpool list bootpool >/dev/null 2>&1 ; then
     # desktop
     do_desktop_fzg_rotate
-    echo "When zpool status shows resilver is complete, press ENTER:"
-    read
     do_detach
+    pv /dev/urandom | dd of=/dev/${DISK}p1 bs=1m
+    pv /dev/urandom | dd of=/dev/${DISK}p2 bs=1m
+    pv /dev/urandom | dd of=/dev/${DISK}p3 bs=1m
     pv /dev/urandom | dd of=/dev/${DISK}p4 bs=1m
+    gpart destroy -F ${DISK}
     do_desktop_fzg_rotate
+    zpool detach pool ${DISK}p4.eli
+    geli detach ${DISK}p4
+    geli restore /boot/${DISK}p4.eli /dev/${DISK}p4
+    geli attach -k /boot/encryption.key ${DISK}p4
+    if [ "ada0" = "$DISK" ]; then
+        zpool attach pool ada1p4.eli ${DISK}p4.eli
+    else
+        zpool attach pool ada0p4.eli ${DISK}p4.eli
+    fi
 else
     # server
     do_fzg_rotate
-    echo "When zpool status shows resilver is complete, press ENTER:"
-    read
     do_detach
+    pv /dev/urandom | dd of=/dev/${DISK}p1 bs=1m
+    pv /dev/urandom | dd of=/dev/${DISK}p2 bs=1m
     pv /dev/urandom | dd of=/dev/${DISK}p3 bs=1m
     do_fzg_rotate
 fi
