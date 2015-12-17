@@ -196,6 +196,7 @@
 /usr/local/bin/disable-ucarp                                   root      wheel     755
 /usr/local/bin/dlna-link-mp3-to-music                          root      wheel     755
 /usr/local/bin/dlna-permissions                                root      wheel     755
+/usr/local/bin/dwmstatus                                       root      wheel     755
 /usr/local/bin/enable-ucarp                                    root      wheel     755
 /usr/local/bin/ff2mp3                                          root      wheel     755
 /usr/local/bin/ff2mp4                                          root      wheel     755
