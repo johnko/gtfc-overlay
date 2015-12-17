@@ -1,7 +1,0 @@
-set-option -g status-right \
-'#[bg=colour26] \
-#{pane_start_command} \
-#[bg=colour14] \
-%y%m%d-%H%M%S \
-#[default] \
-#h '
