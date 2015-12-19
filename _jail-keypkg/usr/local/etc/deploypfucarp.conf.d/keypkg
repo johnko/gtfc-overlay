@@ -1,2 +1,2 @@
 # name public_ip public_port real_port ucarp=u_or_dot=off
-ejabberd        0   5222    5222    u
+keypkg          0   6371    6371    .
