@@ -374,6 +374,7 @@
 /usr/local/etc/deployjails.conf.d/060_vnc                      root      wheel     644
 /usr/local/etc/deployjails.conf.d/065_monit                    root      wheel     644
 /usr/local/etc/deployjails.conf.d/070_zabbix                   root      wheel     644
+/usr/local/etc/deployjails.conf.d/075_easydnsclient            root      wheel     644
 /usr/local/etc/deployjails.conf.d/900_builderffmpegpkg         root      wheel     644
 
 /usr/local/etc/deploypfucarp.conf.d                            root      wheel     755
