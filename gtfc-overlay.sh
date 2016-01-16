@@ -163,16 +163,14 @@ compare_old_new 'crontabbed' && users_crontabbed
 
 ## iocage fetch doesn't work if called during git push
 ## workaround is to start them in tmux
-ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 && tmux new-window -d _deploy_jails
-## let _deploy_jails handle the ioc-setup
-#[ -e /etc/rc.conf.d/iocage ] && tmux new-window -d ioc-setup
+ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 && tmux new-session -d _deploy_jails
 
 ## restarting or reloading services doesn't work if called during git push
 ## workaround is to start them in tmux
-compare_old_new '/etc/ssh.*sshd_config' && tmux new-window -d /etc/rc.d/sshd reload
-compare_old_new '/etc/rc.conf.d.*mdnsd' && tmux new-window -d /usr/local/etc/rc.d/mdnsd restart
+compare_old_new '/etc/ssh.*sshd_config' && tmux new-session -d /etc/rc.d/sshd reload
+compare_old_new '/etc/rc.conf.d.*mdnsd' && tmux new-session -d /usr/local/etc/rc.d/mdnsd restart
 if compare_old_new '/etc/rc.conf.d.*mdnsresponderposix' || compare_old_new '/usr/local/etc.*mdnsresponder.conf' ; then
-    tmux new-window -d /usr/local/etc/rc.d/mdnsresponderposix restart
+    tmux new-session -d /usr/local/etc/rc.d/mdnsresponderposix restart
 fi
 
 ## exit with success
