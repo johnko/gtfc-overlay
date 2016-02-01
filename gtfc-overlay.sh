@@ -169,6 +169,7 @@ ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 && tmux new-session -d _d
 ## workaround is to start them in tmux
 compare_old_new '/etc/ssh.*sshd_config' && tmux new-session -d /etc/rc.d/sshd reload
 compare_old_new '/etc/rc.conf.d.*mdnsd' && tmux new-session -d /usr/local/etc/rc.d/mdnsd restart
+compare_old_new '/etc/sysctl.conf' && tmux new-session -d /etc/rc.d/sysctl start
 if compare_old_new '/etc/rc.conf.d.*mdnsresponderposix' || compare_old_new '/usr/local/etc.*mdnsresponder.conf' ; then
     tmux new-session -d /usr/local/etc/rc.d/mdnsresponderposix restart
 fi
