@@ -1,7 +1,7 @@
 
 
     To update the operating system:
-            env PAGER=cat freebsd-update -F fetch install
+            env PAGER=cat freebsd-update -F -s update4.freebsd.org fetch install
             reboot
     To update programs:                     pkg update
                                             pkg upgrade
