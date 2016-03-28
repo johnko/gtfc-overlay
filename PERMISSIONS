@@ -54,6 +54,9 @@
 /etc/syslog.conf                                               root      wheel     644
 
 /root                                                          root      wheel     755
+/root/.cshrc                                                   root      wheel     600
+/root/.gitconfig                                               root      wheel     600
+/root/.tmux.conf                                               root      wheel     600
 
 /root/.ssh                                                     root      wheel     700
 /root/.ssh/authorized_keys                                     root      wheel     600
