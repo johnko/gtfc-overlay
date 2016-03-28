@@ -137,6 +137,10 @@ if [ -e $PERMISSIONSFILE ]; then
     done
 fi
 
+# set permission of GITCLUSTERPATH
+find ${GITCLUSTERPATH} -type d -exec chmod 700 {} \;
+find ${GITCLUSTERPATH} -type f -exec chmod 600 {} \;
+
 # create logs
 TOUCHFILES="
 /var/log/zfs-sync-xz-pull-all.log urep urep  644
