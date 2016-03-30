@@ -172,7 +172,7 @@ compare_old_new 'crontabbed' && users_crontabbed
 
 ## iocage fetch doesn't work if called during git push
 ## workaround is to start them in tmux
-ls /usr/local/etc/deployjails.conf.d/* >/dev/null 2>&1 && tmux new-session -d _deploy_jails
+tmux new-session -d _deploy_jails
 
 ## restarting or reloading services doesn't work if called during git push
 ## workaround is to start them in tmux
