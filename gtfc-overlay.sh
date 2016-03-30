@@ -60,6 +60,9 @@ apply_myconfig(){
                 fi
             fi
         done
+        if [ "/" = "${MYINSTALLPREFIX}" ]; then
+            MYINSTALLPREFIX=""
+        fi
         [ -e ${MYINSTALLPREFIX}/usr/local/etc/deployjails.conf.d ] && rm -r ${MYINSTALLPREFIX}/usr/local/etc/deployjails.conf.d
         [ -e ${MYINSTALLPREFIX}/usr/local/etc/deploypfucarp.conf.d ] && rm -r ${MYINSTALLPREFIX}/usr/local/etc/deploypfucarp.conf.d
     fi
