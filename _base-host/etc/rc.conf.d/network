@@ -7,7 +7,7 @@ ifconfig_igb1="SYNCDHCP"
 ifconfig_bge0="SYNCDHCP"
 ifconfig_bge1="SYNCDHCP"
 ### To enable Link Aggregation: BEGIN
-# cloned_interfaces="lo1 lagg0"
+# cloned_interfaces="lo1 lo2 lagg0"
 # ifconfig_lagg0="SYNCDHCP laggproto loadbalance  laggport em0 laggport re0"
 # ifconfig_lagg0="inet 192.168.0.2/24 laggproto loadbalance  laggport em0 laggport re0"
 ### To enable Link Aggregation: END
